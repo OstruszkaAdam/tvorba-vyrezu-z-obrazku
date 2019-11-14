@@ -12,12 +12,12 @@ x_start, y_start, x_end, y_end = 0, 0, 0, 0
 input_image = cv2.imread('img.jpg')
 oriImage = input_image.copy()
 
-pocet_zpracovanych_prstu = 0
+pocet_zpracovanych_kloubu = 0
 
 #######################################################################################################################
 def mouse_crop(event, x, y, flags, param):
     # grab references to the global variables
-    global pocet_zpracovanych_prstu
+    global pocet_zpracovanych_kloubu
     global x_start, y_start, x_end, y_end, cropping
 
     # (x, y) coordinates and indicate that cropping is being
