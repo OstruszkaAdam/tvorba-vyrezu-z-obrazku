@@ -7,7 +7,6 @@ INPUT_IMAGES_DIR = os.getcwd() + "/vstupy/"
 OUTPUT_DIR = os.getcwd() + "/vystupy/"
 
 pocet_zpracovanych_kloubu = 0
-
 xx, yy = 0, 0
 cropping = False
 
@@ -35,11 +34,12 @@ def main():
 
             global pocet_zpracovanych_kloubu, cropping
             cropping = False
+            pocet_zpracovanych_kloubu = 0
 
             snimek_puvodni = cv2.imread(nazevSnimkuVcetneCestyKNemu)
             # if we were not able to successfully open the image, continue with the next iteration of the for loop
             if snimek_puvodni is None:
-                print("unable to open " + nazevSnimku + " as an OpenCV image")
+                print("soubor s nazvem " + nazevSnimku + " se nepovedlo nacist do OpenCV")
                 continue
             # end if
 
@@ -73,6 +73,37 @@ def main():
 
 
 # end main
+
+
+#######################################################################################################################
+def mouse_crop(event, x, y, flags, param):
+    # grab references to the global variables
+    global pocet_zpracovanych_kloubu
+    global x_start, y_start, x_end, y_end, cropping
+    global snimek_puvodni
+    global xx, yy
+
+    # (x, y) coordinates and indicate that cropping is being
+    if event == cv2.EVENT_LBUTTONDOWN:
+        cropping = True
+        xx, yy = x, y
+        pocet_zpracovanych_kloubu += 1
+        print("Souřadnice kloubu číslo " + str(pocet_zpracovanych_kloubu) + " jsou: x = " + str(xx) + " y = " + str(yy))
+
+    # if the left mouse button was released
+    elif event == cv2.EVENT_LBUTTONUP:
+        # cropping = False  # cropping is finished
+        print("croppiiiiiiiiing")
+        x_start, y_start = xx - 150, yy - 150
+        x_end, y_end = xx + 150, yy + 150
+        ref_point = [(x_start, y_start), (x_end, y_end)]
+        roi = snimek_puvodni[ref_point[0][1]:ref_point[1][1], ref_point[0][0]:ref_point[1][0]]
+        cropped_image_name = "Cropped image " + str(pocet_zpracovanych_kloubu) + ".jpg"
+        cv2.imshow("Cropped image", roi)
+        cv2.imwrite(cropped_image_name, roi)
+        xx, yy = 0, 0
+        cropping = False  # cropping is finished
+
 
 #######################################################################################################################
 def ulozitVystupniSnimek(fileName, nazevSnimkuVcetneCestyKNemu, jakeRuceJsouNaSnimku, snimek_puvodni):
@@ -117,38 +148,6 @@ def zapsatVystupniSnimekNaDisk(nazevVystupnihoSnimkuVcetneCestyKNemu, snimekKter
 
 
 # end function
-
-
-#######################################################################################################################
-def mouse_crop(event, x, y, flags, param):
-    # grab references to the global variables
-    global pocet_zpracovanych_kloubu
-    global x_start, y_start, x_end, y_end, cropping
-    global snimek_puvodni
-    global xx, yy
-
-    # (x, y) coordinates and indicate that cropping is being
-    if event == cv2.EVENT_LBUTTONDOWN:
-        x_start, y_start = x - 50, y - 50
-        x_end, y_end = x + 50, y + 50
-        cropping = True
-        xx, yy = x - 50, y - 50
-        pocet_zpracovanych_kloubu += 1
-        print("Souřadnice kloubu číslo " + str(pocet_zpracovanych_kloubu) + " jsou: x = " + str(xx) + " y = " + str(yy))
-
-    # if the left mouse button was released
-    elif event == cv2.EVENT_LBUTTONUP:
-        # cropping = False  # cropping is finished
-        print("croppiiiiiiiiing")
-        x_start, y_start = xx - 50, yy - 50
-        x_end, y_end = xx + 50, yy + 50
-        ref_point = [(x_start, y_start), (x_end, y_end)]
-        roi = snimek_puvodni[ref_point[0][1]:ref_point[1][1], ref_point[0][0]:ref_point[1][0]]
-        cropped_image_name = "Cropped image " + str(pocet_zpracovanych_kloubu) + ".jpg"
-        cv2.imshow("Cropped image", roi)
-        cv2.imwrite(cropped_image_name, roi)
-        xx, yy = 0, 0
-
 
 #######################################################################################################################
 if __name__ == "__main__":
