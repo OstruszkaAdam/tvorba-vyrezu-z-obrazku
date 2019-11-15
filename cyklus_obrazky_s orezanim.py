@@ -24,7 +24,11 @@ def main():
 
             # preskoceni souboru, ktery neni snimek ###################################################################
             # if the file does not end in .jpg or .jpeg (case-insensitive), continue with the next iteration of the for loop
-            if not (nazevSnimku.lower().endswith(".jpg") or nazevSnimku.lower().endswith(".jpeg")):
+            if not (nazevSnimku.lower().endswith(".jpg") or
+                    nazevSnimku.lower().endswith(".jpeg") or
+                    nazevSnimku.lower().endswith(".png") or
+                    nazevSnimku.lower().endswith(".tiff") or
+                    nazevSnimku.lower().endswith(".tif")):
                 continue
             # end if
 
@@ -96,6 +100,16 @@ def mouse_crop(event, x, y, flags, param):
         print("croppiiiiiiiiing")
         x_start, y_start = xx - 150, yy - 150
         x_end, y_end = xx + 150, yy + 150
+
+        # osetreni, aby se souradnice nedostaly mimo obrazek (vadi pouze presah pod nulu)
+        if x_start < 0:
+            x_start = 0
+        # end if
+        if y_start < 0:
+            y_start = 0
+        # end if
+
+
         ref_point = [(x_start, y_start), (x_end, y_end)]
         roi = snimek_puvodni[ref_point[0][1]:ref_point[1][1], ref_point[0][0]:ref_point[1][0]]
         cropped_image_name = "Cropped image " + str(pocet_zpracovanych_kloubu) + ".jpg"
