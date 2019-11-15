@@ -11,39 +11,42 @@ xx, yy = 0, 0
 cropping = False
 
 snimek_puvodni = None
+nazev_puvodniho_snimku = None
+nazev_puvodniho_snimku_vcetne_cesty_k_nemu = None
+
 
 
 #######################################################################################################################
 def main():
 
-    global xx, yy, snimek_puvodni
+    global xx, yy, snimek_puvodni, nazev_puvodniho_snimku, nazev_puvodniho_snimku_vcetne_cesty_k_nemu
     xx, yy = 0, 0
 
     for subdir, dirs, files in os.walk(INPUT_IMAGES_DIR):
-        for nazevSnimku in files:
+        for nazev_puvodniho_snimku in files:
 
             # preskoceni souboru, ktery neni snimek ###################################################################
             # if the file does not end in .jpg or .jpeg (case-insensitive), continue with the next iteration of the for loop
-            if not (nazevSnimku.lower().endswith(".jpg") or
-                    nazevSnimku.lower().endswith(".jpeg") or
-                    nazevSnimku.lower().endswith(".png") or
-                    nazevSnimku.lower().endswith(".tiff") or
-                    nazevSnimku.lower().endswith(".tif")):
+            if not (nazev_puvodniho_snimku.lower().endswith(".jpg") or
+                    nazev_puvodniho_snimku.lower().endswith(".jpeg") or
+                    nazev_puvodniho_snimku.lower().endswith(".png") or
+                    nazev_puvodniho_snimku.lower().endswith(".tiff") or
+                    nazev_puvodniho_snimku.lower().endswith(".tif")):
                 continue
             # end if
 
             # otevrit a zpracovat snimek ##############################################################################
-            nazevSnimkuVcetneCestyKNemu = os.path.join(subdir, nazevSnimku)
-            print("zpracovava se soubor " + nazevSnimkuVcetneCestyKNemu)
+            nazev_puvodniho_snimku_vcetne_cesty_k_nemu = os.path.join(subdir, nazev_puvodniho_snimku)
+            print("zpracovava se soubor " + nazev_puvodniho_snimku_vcetne_cesty_k_nemu)
 
             global pocet_zpracovanych_kloubu, cropping
             cropping = False
             pocet_zpracovanych_kloubu = 0
 
-            snimek_puvodni = cv2.imread(nazevSnimkuVcetneCestyKNemu)
+            snimek_puvodni = cv2.imread(nazev_puvodniho_snimku_vcetne_cesty_k_nemu)
             # if we were not able to successfully open the image, continue with the next iteration of the for loop
             if snimek_puvodni is None:
-                print("soubor s nazvem " + nazevSnimku + " se nepovedlo nacist do OpenCV")
+                print("soubor s nazvem " + nazev_puvodniho_snimku + " se nepovedlo nacist do OpenCV")
                 continue
             # end if
 
@@ -84,7 +87,7 @@ def mouse_crop(event, x, y, flags, param):
     # grab references to the global variables
     global pocet_zpracovanych_kloubu
     global x_start, y_start, x_end, y_end, cropping
-    global snimek_puvodni
+    global snimek_puvodni, nazev_puvodniho_snimku, nazev_puvodniho_snimku_vcetne_cesty_k_nemu
     global xx, yy
 
     # (x, y) coordinates and indicate that cropping is being
@@ -97,7 +100,6 @@ def mouse_crop(event, x, y, flags, param):
     # if the left mouse button was released
     elif event == cv2.EVENT_LBUTTONUP:
         # cropping = False  # cropping is finished
-        print("croppiiiiiiiiing")
         x_start, y_start = xx - 150, yy - 150
         x_end, y_end = xx + 150, yy + 150
 
@@ -113,34 +115,39 @@ def mouse_crop(event, x, y, flags, param):
         ref_point = [(x_start, y_start), (x_end, y_end)]
         roi = snimek_puvodni[ref_point[0][1]:ref_point[1][1], ref_point[0][0]:ref_point[1][0]]
         cropped_image_name = "Cropped image " + str(pocet_zpracovanych_kloubu) + ".jpg"
+
+        # tyhle dva radky prijdou asi smazat
         cv2.imshow("Cropped image", roi)
-        cv2.imwrite(cropped_image_name, roi)
+        # cv2.imwrite(cropped_image_name, roi)
+
+        ulozitVystupniSnimek(nazev_puvodniho_snimku, nazev_puvodniho_snimku_vcetne_cesty_k_nemu, cropped_image_name, roi)
+
         xx, yy = 0, 0
         cropping = False  # cropping is finished
 
 
 #######################################################################################################################
-def ulozitVystupniSnimek(fileName, nazevSnimkuVcetneCestyKNemu, jakeRuceJsouNaSnimku, snimek_puvodni):
+def ulozitVystupniSnimek(nazev_snimku, nazev_snimku_vcetne_cesty_k_nemu, oznaceni_kloubu, snimek_k_ulozeni):
     # oriznuti pripony z nazvu souboru
-    nazevSnimkuBezPripony = os.path.splitext(fileName)[0]
+    nazevSnimkuBezPripony = os.path.splitext(nazev_snimku)[0]
     # vyjmuti samotne pripony
-    PouzePripona = os.path.splitext(fileName)[1]
+    PouzePripona = os.path.splitext(nazev_snimku)[1]
 
-    cestaDoSlozkySeSnimkem = os.path.dirname(nazevSnimkuVcetneCestyKNemu) + "/"  # ziskani cesty do slozky se snimkem
+    cestaDoSlozkySeSnimkem = os.path.dirname(nazev_snimku_vcetne_cesty_k_nemu) + "/"  # ziskani cesty do slozky se snimkem
 
     # pokud se cesta ke snimku rovna ceste ke vstupni slozce (tzn. snimek uz neni dale zanoreny do podslozek)
     if cestaDoSlozkySeSnimkem == INPUT_IMAGES_DIR:
         # jenom zpracovat snimek BEZ zpracovani jmena podslozky
 
-        nazevVystupnihoSnimku = OUTPUT_DIR + nazevSnimkuBezPripony + "_" + jakeRuceJsouNaSnimku + PouzePripona
-        zapsatVystupniSnimekNaDisk(nazevVystupnihoSnimku, snimek_puvodni)
+        nazevVystupnihoSnimku = OUTPUT_DIR + nazevSnimkuBezPripony + "_" + oznaceni_kloubu + PouzePripona
+        zapsatVystupniSnimekNaDisk(nazevVystupnihoSnimku, snimek_k_ulozeni)
 
     # pokud snimek je dale zanoreny do podslozek
     else:
         # zpracovat snimek a zpracovat i jmeno podslozky (tzn. vytvorit ji v cilovem umisteni)
 
         # ziskani nazvu podslozky, ve ktere je snimek umisteny
-        cestaDoSlozkySeSnimkem = os.path.dirname(nazevSnimkuVcetneCestyKNemu)  # ziskani cesty do slozky se snimkem
+        cestaDoSlozkySeSnimkem = os.path.dirname(nazev_snimku_vcetne_cesty_k_nemu)  # ziskani cesty do slozky se snimkem
         nazevPodslozkySeSnimky = os.path.split(cestaDoSlozkySeSnimkem)[1]  # ziskani nazvu pouze posledni slozky
 
         # vytvoreni podlozky v cilove slozky (pokud jeste neexistuje)
@@ -148,8 +155,8 @@ def ulozitVystupniSnimek(fileName, nazevSnimkuVcetneCestyKNemu, jakeRuceJsouNaSn
         if not os.path.exists(cilovaSlozkaVcetnePodslozky):
             os.makedirs(cilovaSlozkaVcetnePodslozky)
 
-        nazevVystupnihoSnimku = cilovaSlozkaVcetnePodslozky + nazevSnimkuBezPripony + "_" + jakeRuceJsouNaSnimku + PouzePripona
-        zapsatVystupniSnimekNaDisk(nazevVystupnihoSnimku, snimek_puvodni)
+        nazevVystupnihoSnimku = cilovaSlozkaVcetnePodslozky + nazevSnimkuBezPripony + "_" + oznaceni_kloubu + PouzePripona
+        zapsatVystupniSnimekNaDisk(nazevVystupnihoSnimku, snimek_k_ulozeni)
     # end if
 
 
