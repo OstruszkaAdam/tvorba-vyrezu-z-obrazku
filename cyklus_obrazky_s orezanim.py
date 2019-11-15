@@ -7,8 +7,10 @@ INPUT_IMAGES_DIR = os.getcwd() + "/vstupy/"
 OUTPUT_DIR = os.getcwd() + "/vystupy/"
 
 pocet_zpracovanych_kloubu = 0
-xx, yy = 0, 0
+x_souradnice_kloubu, y_souradnice_kloubu = 0, 0
 cropping = False
+
+zmenseno = False
 
 snimek_puvodni = None
 nazev_puvodniho_snimku = None
@@ -40,8 +42,8 @@ nazvy_vsech_kloubu = {
 
 #######################################################################################################################
 def main():
-    global xx, yy, snimek_puvodni, nazev_puvodniho_snimku, nazev_puvodniho_snimku_vcetne_cesty_k_nemu
-    xx, yy = 0, 0
+    global x_souradnice_kloubu, y_souradnice_kloubu, snimek_puvodni, nazev_puvodniho_snimku, nazev_puvodniho_snimku_vcetne_cesty_k_nemu
+    x_souradnice_kloubu, y_souradnice_kloubu = 0, 0
 
     for subdir, dirs, files in os.walk(INPUT_IMAGES_DIR):
         for nazev_puvodniho_snimku in files:
@@ -60,6 +62,7 @@ def main():
             nazev_puvodniho_snimku_vcetne_cesty_k_nemu = os.path.join(subdir, nazev_puvodniho_snimku)
             print("zpracovava se soubor " + nazev_puvodniho_snimku_vcetne_cesty_k_nemu)
 
+            global zmenseno
             global pocet_zpracovanych_kloubu, cropping
             cropping = False
             pocet_zpracovanych_kloubu = 0
@@ -76,6 +79,7 @@ def main():
             sirka_obrazku = np.size(snimek_puvodni, 1)
 
             if vyska_obrazku > 1000:
+                zmenseno = True
                 sirka_okna = round(sirka_obrazku * 0.6)
                 vyska_okna = round(vyska_obrazku * 0.6)
 
@@ -110,21 +114,23 @@ def mouse_crop(event, x, y, flags, param):
     global x_start, y_start, x_end, y_end, cropping
     global snimek_puvodni, nazev_puvodniho_snimku, nazev_puvodniho_snimku_vcetne_cesty_k_nemu
     global nazvy_vsech_kloubu
-    global xx, yy
+    global x_souradnice_kloubu, y_souradnice_kloubu
 
     # pokud jsme zatim nedosahli mnozstvi kloubu ve snimku
     if pocet_zpracovanych_kloubu <  12:
         # (x, y) coordinates and indicate that cropping is being
         if event == cv2.EVENT_LBUTTONDOWN:
             cropping = True
-            xx, yy = x, y
-            print("Souřadnice kloubu " + nazvy_vsech_kloubu[pocet_zpracovanych_kloubu] + " jsou: x = " + str(xx) + " y = " + str(yy))
+            x_souradnice_kloubu, y_souradnice_kloubu = x, y
+            print("Souřadnice kloubu " + nazvy_vsech_kloubu[pocet_zpracovanych_kloubu] + " jsou: x = " + str(x_souradnice_kloubu) + " y = " + str(y_souradnice_kloubu))
 
         # if the left mouse button was released
         elif event == cv2.EVENT_LBUTTONUP:
             # cropping = False  # cropping is finished
-            x_start, y_start = xx - 150, yy - 150
-            x_end, y_end = xx + 150, yy + 150
+
+            # rozmery odpovidaji vstupnimu formatu inception, ktery je 299x299 px
+            x_start, y_start = x_souradnice_kloubu - 149, y_souradnice_kloubu - 149
+            x_end, y_end = x_souradnice_kloubu + 150, y_souradnice_kloubu + 150
 
             # osetreni, aby se souradnice nedostaly mimo obrazek (vadi pouze presah pod nulu)
             if x_start < 0:
@@ -141,10 +147,12 @@ def mouse_crop(event, x, y, flags, param):
             cv2.imshow("Cropped image", roi)
             # cv2.imwrite(cropped_image_name, roi)
 
-            ulozitVystupniSnimek(nazev_puvodniho_snimku, nazev_puvodniho_snimku_vcetne_cesty_k_nemu,
-                                 nazvy_vsech_kloubu[pocet_zpracovanych_kloubu], roi)
+            ulozitVystupniSnimek(nazev_puvodniho_snimku,
+                                 nazev_puvodniho_snimku_vcetne_cesty_k_nemu,
+                                 nazvy_vsech_kloubu[pocet_zpracovanych_kloubu],
+                                 roi)
 
-            xx, yy = 0, 0
+            x_souradnice_kloubu, y_souradnice_kloubu = 0, 0
             cropping = False  # cropping is finished
             pocet_zpracovanych_kloubu += 1
         # end if
@@ -197,7 +205,7 @@ def ulozitVystupniSnimek(nazev_snimku, nazev_snimku_vcetne_cesty_k_nemu, oznacen
 def zapsatVystupniSnimekNaDisk(nazevVystupnihoSnimkuVcetneCestyKNemu, snimekKteryMaBytUlozen):
     cv2.imwrite(nazevVystupnihoSnimkuVcetneCestyKNemu, snimekKteryMaBytUlozen)
     print("uklada se soubor " + nazevVystupnihoSnimkuVcetneCestyKNemu)
-    print("")
+    print("")   # odradkovani
 
 
 # end function
@@ -206,9 +214,17 @@ def zapsatVystupniSnimekNaDisk(nazevVystupnihoSnimkuVcetneCestyKNemu, snimekKter
 if __name__ == "__main__":
     main()
 
+# TODO dopocitat spravne souradnice u zmensenych snimku
+# dela OpenCV automaticky :-) Juhuuu
+
 # TODO spravna prace s obrazovymi formaty
+# splneno
+
 # TODO velikost ctverce 299 x 299 px
+# splneno
+
 # TODO aby i vyrezy z okraju snimky byly cvtercove - tzn dodelat cerne pozadi
+
 # TODO dodelat moznost ke kloubum psat popisky (diagnozu)
 # TODO ukladat souradnice, nazvy a dignozy do metadat nebo do souboru bokem
 # TODO vse radne otestovat (rozrezane snimky rukou? - tzn aby to spravne fungovalo pro vsechny prave ruce)
