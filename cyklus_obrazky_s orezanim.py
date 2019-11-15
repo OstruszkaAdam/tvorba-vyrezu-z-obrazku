@@ -10,7 +10,7 @@ pocet_zpracovanych_kloubu = 0
 x_souradnice_kloubu, y_souradnice_kloubu = 0, 0
 cropping = False
 
-zmenseno = False
+dorovnavat_rozmery_na_ctverec = True
 
 snimek_puvodni = None
 nazev_puvodniho_snimku = None
@@ -62,7 +62,6 @@ def main():
             nazev_puvodniho_snimku_vcetne_cesty_k_nemu = os.path.join(subdir, nazev_puvodniho_snimku)
             print("zpracovava se soubor " + nazev_puvodniho_snimku_vcetne_cesty_k_nemu)
 
-            global zmenseno
             global pocet_zpracovanych_kloubu, cropping
             cropping = False
             pocet_zpracovanych_kloubu = 0
@@ -79,7 +78,6 @@ def main():
             sirka_obrazku = np.size(snimek_puvodni, 1)
 
             if vyska_obrazku > 1000:
-                zmenseno = True
                 sirka_okna = round(sirka_obrazku * 0.6)
                 vyska_okna = round(vyska_obrazku * 0.6)
 
@@ -142,6 +140,38 @@ def mouse_crop(event, x, y, flags, param):
 
             ref_point = [(x_start, y_start), (x_end, y_end)]
             roi = snimek_puvodni[ref_point[0][1]:ref_point[1][1], ref_point[0][0]:ref_point[1][0]]
+
+
+            # pokud je vyrez udelany prilis blizko okraje puvodniho obrazku, je nutne k verzu pridat prazdne misto, aby zustal dodrzen format 299 x 299 px
+            tloustka_horniho_ramecku = 0
+            tloustka_leveho_ramecku = 0
+            tloustka_dolniho_ramecku = 0
+            tloustka_praveho_ramecku = 0
+
+            vzdalenost_k_okraji_prava = np.size(snimek_puvodni, 1) - x_souradnice_kloubu
+            vzdalenost_k_okraji_dolni = np.size(snimek_puvodni, 0) - y_souradnice_kloubu
+
+            if dorovnavat_rozmery_na_ctverec:
+                # levy a horni ramecek
+                if x_souradnice_kloubu < 149:
+                    tloustka_leveho_ramecku = 149 - x_souradnice_kloubu
+                # end if
+                if y_souradnice_kloubu < 149:
+                    tloustka_horniho_ramecku = 149 - y_souradnice_kloubu
+                # end if
+                # pravy a dolni ramecek
+                if vzdalenost_k_okraji_prava < 150:
+                    tloustka_praveho_ramecku = 150 - vzdalenost_k_okraji_prava
+                # end if
+                if vzdalenost_k_okraji_dolni < 150:
+                    tloustka_dolniho_ramecku = 150 - vzdalenost_k_okraji_dolni
+                # end if
+                roi = cv2.copyMakeBorder(roi, tloustka_horniho_ramecku, tloustka_dolniho_ramecku, tloustka_leveho_ramecku, tloustka_praveho_ramecku, cv2.BORDER_CONSTANT, value=[0, 0, 0])
+                # cv2.copyMakeBorder(obrazek, horni, dolni, leva, prava ,typ_okraje, barva)
+            # end if
+
+
+
 
             # tyhle dva radky prijdou asi smazat
             cv2.imshow("Cropped image", roi)
@@ -224,6 +254,7 @@ if __name__ == "__main__":
 # splneno
 
 # TODO aby i vyrezy z okraju snimky byly cvtercove - tzn dodelat cerne pozadi
+# splneno
 
 # TODO dodelat moznost ke kloubum psat popisky (diagnozu)
 # TODO ukladat souradnice, nazvy a dignozy do metadat nebo do souboru bokem
