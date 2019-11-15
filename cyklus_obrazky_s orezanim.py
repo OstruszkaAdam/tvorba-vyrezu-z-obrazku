@@ -14,11 +14,32 @@ snimek_puvodni = None
 nazev_puvodniho_snimku = None
 nazev_puvodniho_snimku_vcetne_cesty_k_nemu = None
 
+nazvy_vsech_kloubu = {
+    # poradi kloubu je od ukazovacku k malicku (tzn od 2 do 5) a od MCP k DIP
+    # klouby zapesti a palce nejsou pro tyto ucely relevantni, a proto jsou vynechany
+
+    # MCP vrstva (nejblize k zapesti)
+    0: "MCP-2",  # ukazovacek
+    1: "MCP-3",  # prostrednicek
+    2: "MCP-4",  # prstenicek
+    3: "MCP-5",  # malicek
+
+    # PIP vrstva
+    4: "PIP-2",  # ukazovacek
+    5: "PIP-3",  # prostrednicek
+    6: "PIP-4",  # prstenicek
+    7: "PIP-5",  # malicek
+
+    # DIP vrstva (kloub mezi predposlednim a poslednim clankem)
+    8: "DIP-2",  # ukazovacek
+    9: "DIP-3",  # prostrednicek
+    10: "DIP-4",  # prstenicek
+    11: "DIP-5"  # malicek
+}
 
 
 #######################################################################################################################
 def main():
-
     global xx, yy, snimek_puvodni, nazev_puvodniho_snimku, nazev_puvodniho_snimku_vcetne_cesty_k_nemu
     xx, yy = 0, 0
 
@@ -88,42 +109,51 @@ def mouse_crop(event, x, y, flags, param):
     global pocet_zpracovanych_kloubu
     global x_start, y_start, x_end, y_end, cropping
     global snimek_puvodni, nazev_puvodniho_snimku, nazev_puvodniho_snimku_vcetne_cesty_k_nemu
+    global nazvy_vsech_kloubu
     global xx, yy
 
-    # (x, y) coordinates and indicate that cropping is being
-    if event == cv2.EVENT_LBUTTONDOWN:
-        cropping = True
-        xx, yy = x, y
-        pocet_zpracovanych_kloubu += 1
-        print("Souřadnice kloubu číslo " + str(pocet_zpracovanych_kloubu) + " jsou: x = " + str(xx) + " y = " + str(yy))
+    # pokud jsme zatim nedosahli mnozstvi kloubu ve snimku
+    if pocet_zpracovanych_kloubu <  12:
+        # (x, y) coordinates and indicate that cropping is being
+        if event == cv2.EVENT_LBUTTONDOWN:
+            cropping = True
+            xx, yy = x, y
+            print("Souřadnice kloubu " + nazvy_vsech_kloubu[pocet_zpracovanych_kloubu] + " jsou: x = " + str(xx) + " y = " + str(yy))
 
-    # if the left mouse button was released
-    elif event == cv2.EVENT_LBUTTONUP:
-        # cropping = False  # cropping is finished
-        x_start, y_start = xx - 150, yy - 150
-        x_end, y_end = xx + 150, yy + 150
+        # if the left mouse button was released
+        elif event == cv2.EVENT_LBUTTONUP:
+            # cropping = False  # cropping is finished
+            x_start, y_start = xx - 150, yy - 150
+            x_end, y_end = xx + 150, yy + 150
 
-        # osetreni, aby se souradnice nedostaly mimo obrazek (vadi pouze presah pod nulu)
-        if x_start < 0:
-            x_start = 0
+            # osetreni, aby se souradnice nedostaly mimo obrazek (vadi pouze presah pod nulu)
+            if x_start < 0:
+                x_start = 0
+            # end if
+            if y_start < 0:
+                y_start = 0
+            # end if
+
+            ref_point = [(x_start, y_start), (x_end, y_end)]
+            roi = snimek_puvodni[ref_point[0][1]:ref_point[1][1], ref_point[0][0]:ref_point[1][0]]
+
+            # tyhle dva radky prijdou asi smazat
+            cv2.imshow("Cropped image", roi)
+            # cv2.imwrite(cropped_image_name, roi)
+
+            ulozitVystupniSnimek(nazev_puvodniho_snimku, nazev_puvodniho_snimku_vcetne_cesty_k_nemu,
+                                 nazvy_vsech_kloubu[pocet_zpracovanych_kloubu], roi)
+
+            xx, yy = 0, 0
+            cropping = False  # cropping is finished
+            pocet_zpracovanych_kloubu += 1
         # end if
-        if y_start < 0:
-            y_start = 0
-        # end if
-
-
-        ref_point = [(x_start, y_start), (x_end, y_end)]
-        roi = snimek_puvodni[ref_point[0][1]:ref_point[1][1], ref_point[0][0]:ref_point[1][0]]
-        cropped_image_name = "Cropped image " + str(pocet_zpracovanych_kloubu) + ".jpg"
-
-        # tyhle dva radky prijdou asi smazat
-        cv2.imshow("Cropped image", roi)
-        # cv2.imwrite(cropped_image_name, roi)
-
-        ulozitVystupniSnimek(nazev_puvodniho_snimku, nazev_puvodniho_snimku_vcetne_cesty_k_nemu, cropped_image_name, roi)
-
-        xx, yy = 0, 0
-        cropping = False  # cropping is finished
+    # pokud uz jsme maximalniho mnozstvi kloubu dosahli
+    else:
+        if event == cv2.EVENT_LBUTTONDOWN:
+            print("Prejdete na dalsi snimek")
+            print("")
+    # end if
 
 
 #######################################################################################################################
@@ -166,6 +196,8 @@ def ulozitVystupniSnimek(nazev_snimku, nazev_snimku_vcetne_cesty_k_nemu, oznacen
 #######################################################################################################################
 def zapsatVystupniSnimekNaDisk(nazevVystupnihoSnimkuVcetneCestyKNemu, snimekKteryMaBytUlozen):
     cv2.imwrite(nazevVystupnihoSnimkuVcetneCestyKNemu, snimekKteryMaBytUlozen)
+    print("uklada se soubor " + nazevVystupnihoSnimkuVcetneCestyKNemu)
+    print("")
 
 
 # end function
@@ -173,3 +205,12 @@ def zapsatVystupniSnimekNaDisk(nazevVystupnihoSnimkuVcetneCestyKNemu, snimekKter
 #######################################################################################################################
 if __name__ == "__main__":
     main()
+
+# TODO spravna prace s obrazovymi formaty
+# TODO velikost ctverce 299 x 299 px
+# TODO aby i vyrezy z okraju snimky byly cvtercove - tzn dodelat cerne pozadi
+# TODO dodelat moznost ke kloubum psat popisky (diagnozu)
+# TODO ukladat souradnice, nazvy a dignozy do metadat nebo do souboru bokem
+# TODO vse radne otestovat (rozrezane snimky rukou? - tzn aby to spravne fungovalo pro vsechny prave ruce)
+
+
