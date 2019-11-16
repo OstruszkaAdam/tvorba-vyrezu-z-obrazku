@@ -27,10 +27,10 @@ nazvy_vsech_kloubu = {
     3: "MCP-5",  # malicek
 
     # PIP vrstva
-    4: "PIP-2",  # ukazovacek
-    5: "PIP-3",  # prostrednicek
-    6: "PIP-4",  # prstenicek
-    7: "PIP-5",  # malicek
+    4: "PIP-5",  # ukazovacek
+    5: "PIP-4",  # prostrednicek
+    6: "PIP-3",  # prstenicek
+    7: "PIP-2",  # malicek
 
     # DIP vrstva (kloub mezi predposlednim a poslednim clankem)
     8: "DIP-2",  # ukazovacek
@@ -53,8 +53,8 @@ def main():
             if not (nazev_puvodniho_snimku.lower().endswith(".jpg") or
                     nazev_puvodniho_snimku.lower().endswith(".jpeg") or
                     nazev_puvodniho_snimku.lower().endswith(".png") or
-                    nazev_puvodniho_snimku.lower().endswith(".tiff") or
-                    nazev_puvodniho_snimku.lower().endswith(".tif")):
+                    nazev_puvodniho_snimku.lower().endswith(".tif") or
+                    nazev_puvodniho_snimku.lower().endswith(".tiff")):
                 continue
             # end if
 
