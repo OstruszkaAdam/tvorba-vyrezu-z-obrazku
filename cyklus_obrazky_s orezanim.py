@@ -1,6 +1,8 @@
+from collections import OrderedDict
 import numpy as np
 import cv2
 import os
+import pickle
 
 # module-level variables ##############################################################################################
 INPUT_IMAGES_DIR = os.getcwd() + "/vstupy/"
@@ -15,6 +17,8 @@ dorovnavat_rozmery_na_ctverec = True
 snimek_puvodni = None
 nazev_puvodniho_snimku = None
 nazev_puvodniho_snimku_vcetne_cesty_k_nemu = None
+
+souradnice_vsech_kloubu = OrderedDict()
 
 nazvy_vsech_kloubu = {
     # poradi kloubu je od ukazovacku k malicku (tzn od 2 do 5) a od MCP k DIP
@@ -48,6 +52,12 @@ def main():
     for subdir, dirs, files in os.walk(INPUT_IMAGES_DIR):
         for nazev_puvodniho_snimku in files:
 
+            # nasetovani a vynulovani promennych
+            global pocet_zpracovanych_kloubu, cropping, souradnice_vsech_kloubu
+            cropping = False
+            pocet_zpracovanych_kloubu = 0
+            souradnice_vsech_kloubu.clear()
+
             # preskoceni souboru, ktery neni snimek ###################################################################
             # if the file does not end in .jpg or .jpeg (case-insensitive), continue with the next iteration of the for loop
             if not (nazev_puvodniho_snimku.lower().endswith(".jpg") or
@@ -61,10 +71,6 @@ def main():
             # otevrit a zpracovat snimek ##############################################################################
             nazev_puvodniho_snimku_vcetne_cesty_k_nemu = os.path.join(subdir, nazev_puvodniho_snimku)
             print("zpracovava se soubor " + nazev_puvodniho_snimku_vcetne_cesty_k_nemu)
-
-            global pocet_zpracovanych_kloubu, cropping
-            cropping = False
-            pocet_zpracovanych_kloubu = 0
 
             snimek_puvodni = cv2.imread(nazev_puvodniho_snimku_vcetne_cesty_k_nemu)
             # if we were not able to successfully open the image, continue with the next iteration of the for loop
@@ -93,6 +99,7 @@ def main():
             cv2.setMouseCallback("Snimek ke zpracovani", mouse_crop)
 
             cv2.waitKey(0)  # 0 = program ceka, dokud nestisknu libovolnou klavesu
+            zapsatPopiskyKvystupnimuSnimkuNaDisk(nazev_puvodniho_snimku_vcetne_cesty_k_nemu, souradnice_vsech_kloubu)
             cv2.destroyWindow("Snimek ke zpracovani")
             cv2.destroyAllWindows()
 
@@ -100,10 +107,7 @@ def main():
 
         # end for
     # end for
-
-
 # end main
-
 
 #######################################################################################################################
 def mouse_crop(event, x, y, flags, param):
@@ -113,9 +117,10 @@ def mouse_crop(event, x, y, flags, param):
     global snimek_puvodni, nazev_puvodniho_snimku, nazev_puvodniho_snimku_vcetne_cesty_k_nemu
     global nazvy_vsech_kloubu
     global x_souradnice_kloubu, y_souradnice_kloubu
+    global souradnice_vsech_kloubu
 
     # pokud jsme zatim nedosahli mnozstvi kloubu ve snimku
-    if pocet_zpracovanych_kloubu <  12:
+    if pocet_zpracovanych_kloubu < 12:
         # (x, y) coordinates and indicate that cropping is being
         if event == cv2.EVENT_LBUTTONDOWN:
             cropping = True
@@ -124,7 +129,8 @@ def mouse_crop(event, x, y, flags, param):
 
         # if the left mouse button was released
         elif event == cv2.EVENT_LBUTTONUP:
-            # cropping = False  # cropping is finished
+            souradnice_vsech_kloubu.update({nazvy_vsech_kloubu[pocet_zpracovanych_kloubu]: [x_souradnice_kloubu, y_souradnice_kloubu]})
+            print(souradnice_vsech_kloubu)
 
             # rozmery odpovidaji vstupnimu formatu inception, ktery je 299x299 px
             x_start, y_start = x_souradnice_kloubu - 149, y_souradnice_kloubu - 149
@@ -171,6 +177,7 @@ def mouse_crop(event, x, y, flags, param):
             # end if
 
 
+            # cropping = False  # cropping is finished
 
 
             # tyhle dva radky prijdou asi smazat
@@ -237,27 +244,23 @@ def zapsatVystupniSnimekNaDisk(nazevVystupnihoSnimkuVcetneCestyKNemu, snimekKter
     print("uklada se soubor " + nazevVystupnihoSnimkuVcetneCestyKNemu)
     print("")   # odradkovani
 
+# end function
+
+
+#######################################################################################################################
+def zapsatPopiskyKvystupnimuSnimkuNaDisk(nazev_snimku_vcetne_cesty_k_nemu, souradnice_vsech_kloubu):
+
+    nazev_snimku_vcetne_cesty_ale_bez_pripony = nazev_snimku_vcetne_cesty_k_nemu.rsplit('.',1)[0] # odebrani obrazove pripony
+    nazev_soubory_s_popisky = nazev_snimku_vcetne_cesty_ale_bez_pripony + ".p" # pridani pripony formatu pickle
+    pickle.dump(souradnice_vsech_kloubu, open(
+        nazev_soubory_s_popisky, "wb"))
+
+    print("uklada se soubor " + nazev_soubory_s_popisky)
+    print("")   # odradkovani
 
 # end function
+
 
 #######################################################################################################################
 if __name__ == "__main__":
     main()
-
-# TODO dopocitat spravne souradnice u zmensenych snimku
-# dela OpenCV automaticky :-) Juhuuu
-
-# TODO spravna prace s obrazovymi formaty
-# splneno
-
-# TODO velikost ctverce 299 x 299 px
-# splneno
-
-# TODO aby i vyrezy z okraju snimky byly cvtercove - tzn dodelat cerne pozadi
-# splneno
-
-# TODO dodelat moznost ke kloubum psat popisky (diagnozu)
-# TODO ukladat souradnice, nazvy a dignozy do metadat nebo do souboru bokem
-# TODO vse radne otestovat (rozrezane snimky rukou? - tzn aby to spravne fungovalo pro vsechny prave ruce)
-
-

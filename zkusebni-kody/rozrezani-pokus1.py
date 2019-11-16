@@ -9,7 +9,7 @@ cropping = False
 
 x_start, y_start, x_end, y_end = 0, 0, 0, 0
 
-input_image = cv2.imread('img.jpg')
+input_image = cv2.imread('vstupy/01test.png')
 oriImage = input_image.copy()
 
 pocet_zpracovanych_kloubu = 0
@@ -29,13 +29,13 @@ def mouse_crop(event, x, y, flags, param):
     # if the left mouse button was released
     elif event == cv2.EVENT_LBUTTONUP:
         cropping = False  # cropping is finished
-        pocet_zpracovanych_prstu += 1
-        print(pocet_zpracovanych_prstu)
+        pocet_zpracovanych_kloubu += 1
+        print(pocet_zpracovanych_kloubu)
 
         ref_point = [(x_start, y_start), (x_end, y_end)]
 
         roi = oriImage[ref_point[0][1]:ref_point[1][1], ref_point[0][0]:ref_point[1][0]]
-        cropped_image_name = "Cropped image " + str(pocet_zpracovanych_prstu) + ".jpg"
+        cropped_image_name = "Cropped image " + str(pocet_zpracovanych_kloubu) + ".jpg"
         cv2.imshow("Cropped image", roi)
         imwrite(cropped_image_name, roi)
 # end mouse_crop
