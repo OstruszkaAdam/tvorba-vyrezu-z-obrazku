@@ -27,6 +27,7 @@ jednotlivých kloubů.
    pojmenované špatně. Obrázek znázorňuje pravou ruku, v případě levé
    ruky je nutné zachovávat stejné pořadí prstů (tzn. začínat u
    ukazováčku a končit u malíčku)
+   
    ![Klouby se označují v tomto pořadí](dokumentace/posloupnost-kliknuti.jpg)
 4. Na další snímek se přejde po stisknutí libovolné klávesy. 
 
