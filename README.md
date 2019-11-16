@@ -48,7 +48,7 @@ jednotlivých kloubů.**
     opět png).
 -   Do složky se vstupním snímkem se ukládají i metadata – souřadnice
     označených kloubů. Souřadnice si knihovna OpenCV sama přepočítá z
-    rozměrů okna se snímkem na rozměry skutečného snímku-
+    rozměrů okna se snímkem na rozměry skutečného snímku.
 -   Metadata se ukládají ve formátu, který je čitelný
     pouze strojově, a lze je přečíst v jiném programu napsaném v
     Pythonu. Metadata se ukládají pomocí knihovny Pickle jako
