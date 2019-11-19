@@ -9,8 +9,8 @@ cropping = False
 
 x_start, y_start, x_end, y_end = 0, 0, 0, 0
 
-input_image = cv2.imread('01_ruka_leva.jpg')
-oriImage = input_image.copy()
+snimek_puvodni = cv2.imread('01_ruka_leva.jpg')
+oriImage = snimek_puvodni.copy()
 
 pocet_zpracovanych_kloubu = 0
 
@@ -51,16 +51,16 @@ cv2.setMouseCallback("image", mouse_crop)
 
 while True:
 
-    obrazek_ke_zobrazeni = input_image.copy()
+    obrazek_ke_zobrazeni = snimek_puvodni.copy()
 
     if not cropping:
         # ohraniceni vyrezu
         cv2.rectangle(obrazek_ke_zobrazeni, (x_start, y_start), (x_end, y_end), (0.0, 165.0, 255.0), 2)
         # barevne zvyrazneni vnitrku vyrezu
         cv2.rectangle(obrazek_ke_zobrazeni, (x_start, y_start), (x_end, y_end), (0.0, 165.0, 255.0), -1)
-        alpha = 0.4  # Transparency factor.
+        alpha = 0.1  # Transparency factor.
         # Following line overlays transparent rectangle over the image
-        obrazek_se_zvyraznenim = cv2.addWeighted(obrazek_ke_zobrazeni, alpha, input_image, 1 - alpha, 0)
+        obrazek_se_zvyraznenim = cv2.addWeighted(obrazek_ke_zobrazeni, alpha, snimek_puvodni, 1 - alpha, 0)
         cv2.imshow("image", obrazek_se_zvyraznenim)
 
     elif cropping:

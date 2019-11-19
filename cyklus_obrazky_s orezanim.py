@@ -56,6 +56,9 @@ def main():
         for nazev_puvodniho_snimku in files:
 
             # nasetovani a vynulovani promennych
+            global x_start, y_start, x_end, y_end, cropping
+            x_start, y_start = 0, 0
+            x_end, y_end = 10,10
             global pocet_zpracovanych_kloubu, cropping, souradnice_vsech_kloubu
             cropping = False
             pocet_zpracovanych_kloubu = 0
@@ -87,8 +90,9 @@ def main():
             sirka_obrazku = np.size(snimek_puvodni, 1)
 
             if vyska_obrazku > 1000:
-                sirka_okna = round(sirka_obrazku * 0.5)
-                vyska_okna = round(vyska_obrazku * 0.5)
+                pomer_zmenseni = 0.5
+                sirka_okna = round(sirka_obrazku * pomer_zmenseni)
+                vyska_okna = round(vyska_obrazku * pomer_zmenseni)
 
             else:
                 sirka_okna = sirka_obrazku
@@ -125,32 +129,53 @@ def mouse_crop(event, x, y, flags, param):
     global nazvy_vsech_kloubu
     global x_souradnice_kloubu, y_souradnice_kloubu
     global souradnice_vsech_kloubu
+    global pomer_zmenseni
+
+    obrazek_ke_zobrazeni = snimek_puvodni.copy()
 
     # pokud jsme zatim nedosahli mnozstvi kloubu ve snimku
     if pocet_zpracovanych_kloubu < 13:
+
+        # rozmery vyrezu kloubu na prstech odpovidaji vstupnimu formatu inception, ktery je 299x299 px
+        kratsi_polovina_strany = 149
+        delsi_polovina_strany = 150
+
+        # pokud ale jde o kloub zapesti, je nutne pouzi vetsi rozmer, aby se do vyrezu vubec vesel
+        if pocet_zpracovanych_kloubu == 12:
+            kratsi_polovina_strany = 249
+            delsi_polovina_strany = 250
+        # end if
+
+        if event == cv2.EVENT_MOUSEMOVE:
+            x_start, y_start = x - kratsi_polovina_strany, y - kratsi_polovina_strany
+            x_end, y_end = x + delsi_polovina_strany, y + delsi_polovina_strany
+
+            # barevne zvyrazneni vnitrku vyberu
+            cv2.rectangle(obrazek_ke_zobrazeni, (x_start, y_start), (x_end, y_end), (0.0, 165.0, 255.0), -1)
+
+            # pridani polopruhledneho vyberu k puvodnimu obrzaku
+            mira_pruhlednosti = 0.75
+            obrazek_ke_zobrazeni = cv2.addWeighted(obrazek_ke_zobrazeni, 1 - mira_pruhlednosti, snimek_puvodni, mira_pruhlednosti, 0)
+
+            # ohraniceni vyberu
+            cv2.rectangle(obrazek_ke_zobrazeni, (x_start, y_start), (x_end, y_end), (0.0, 165.0, 255.0), 2)
+
+            # zobrazeni obrazku se zvyraznenym vyberem
+            cv2.imshow("Snimek ke zpracovani", obrazek_ke_zobrazeni)
+
+
         # (x, y) coordinates and indicate that cropping is being
-        if event == cv2.EVENT_LBUTTONDOWN:
+        elif event == cv2.EVENT_LBUTTONDOWN:
             cropping = True
             x_souradnice_kloubu, y_souradnice_kloubu = x, y
             print(str(pocet_zpracovanych_kloubu) + ". kloub v poradi je " + nazvy_vsech_kloubu[pocet_zpracovanych_kloubu]
                   + ", jeho souradnice jsou: x = " + str(x_souradnice_kloubu) + " y = " + str(y_souradnice_kloubu))
-
 
         # if the left mouse button was released
         elif event == cv2.EVENT_LBUTTONUP:
             souradnice_vsech_kloubu.update(
                 {nazvy_vsech_kloubu[pocet_zpracovanych_kloubu]: [x_souradnice_kloubu, y_souradnice_kloubu]})
             print(souradnice_vsech_kloubu)
-
-            # rozmery vyrezu kloubu na prstech odpovidaji vstupnimu formatu inception, ktery je 299x299 px
-            kratsi_polovina_strany = 149
-            delsi_polovina_strany = 150
-
-            # pokud ale jde o kloub zapesti, je nutne pouzi vetsi rozmer, aby se do vyrezu vubec vesel
-            if pocet_zpracovanych_kloubu == 12:
-                kratsi_polovina_strany = 249
-                delsi_polovina_strany = 250
-            # end if
 
             x_start, y_start = x_souradnice_kloubu - kratsi_polovina_strany, y_souradnice_kloubu - kratsi_polovina_strany
             x_end, y_end = x_souradnice_kloubu + delsi_polovina_strany, y_souradnice_kloubu + delsi_polovina_strany
