@@ -45,7 +45,7 @@ nazvy_vsech_kloubu = {
     11: "DIP-5",  # malicek
 
     # zapesti
-    12: "zapesti"  # malicek
+    12: "RK"  # malicek
 }
 
 
