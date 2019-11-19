@@ -5,8 +5,10 @@ import os
 import pickle
 
 # module-level variables ##############################################################################################
-INPUT_IMAGES_DIR = os.getcwd() + "/vstupy/"
-OUTPUT_DIR = os.getcwd() + "/vystupy/"
+# INPUT_IMAGES_DIR = os.getcwd() + "/vstupy/"
+INPUT_IMAGES_DIR = "H:\MachineLearning\Dataset_02_trenovaci_diagnoza_orientace"
+# OUTPUT_DIR = os.getcwd() + "/vystupy/"
+OUTPUT_DIR = "H:\MachineLearning\Dataset_02_trenovaci_diagnoza_orientace\Rozrezane"
 
 pocet_zpracovanych_kloubu = 0
 x_souradnice_kloubu, y_souradnice_kloubu = 0, 0

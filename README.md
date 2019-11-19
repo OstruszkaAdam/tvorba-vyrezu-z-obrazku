@@ -8,7 +8,10 @@ jednotlivých kloubů.**
 
 # Vstupy a výstupy
 ## Vstupy
--  Obrázek, resp. složka s obrázky
+-  Obrázek, resp. složka s obrázky k rozřezání. (Program automaticky
+   zahrne do zpracování i snímky v podložkách.)
+-  Složka, do které se mají výřezy ukládat (Podložky si program
+   automaticky vytvoří.)
 
 ## Výstupy
 Pro každý jeden snímek:
@@ -69,6 +72,8 @@ Pro každý jeden snímek:
     pole se souřadnicemi *x* a *y*.
 -   CHYBÍ: možnost k výřezům ukládat popisky (diagnóza, míra poškození,
     apod.)
+-   CHYBÍ: automatické přizpůsobení velikosti výřezu podle rozměrů
+    obrázku
 
 
 
