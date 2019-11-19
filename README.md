@@ -24,12 +24,13 @@ jednotlivých kloubů.**
    další využití. 
 3. Klouby se automaticky pojmenovávají v pořadí zobrazeném na obrázku
    níže. Toto pořadí je při klikání nutné dodržet, jinak budou výřezy
-   pojmenované špatně. Obrázek znázorňuje pravou ruku, v případě levé
-   ruky je nutné zachovávat stejné pořadí prstů (tzn. začínat u
-   ukazováčku a končit u malíčku)
+   pojmenované špatně. Pokud nějaký kloub na snímku ruky chybí (amputace
+   apod.) je přesto potřeba někam kliknout. Ukázkový obrázek znázorňuje
+   pravou ruku, v případě levé ruky je nutné zachovávat stejné pořadí
+   prstů (tzn. začínat u ukazováčku a končit u malíčku)
    
    
-   ![Klouby se označují v tomto pořadí](dokumentace/posloupnost-kliknuti.jpg)
+   ![Zdroj: https://mywwwzone-heckyeahllc.netdna-ssl.com/wp-content/uploads/hand-x-ray-768x923.jpg](dokumentace/posloupnost-kliknuti.jpg)
 4. Na další snímek se přejde po stisknutí libovolné klávesy. 
 5. Pro projdutí všech snímků ve složce se program sám ukončí.
 
@@ -38,11 +39,13 @@ jednotlivých kloubů.**
     příponami jpg, jpeg, png, tif a tiff.
 -   Uživatel na každém snímku klikáním myší vyznačí pozice kloubů,
     program automaticky uloží výřez a pojmenuje ho složením původního
-    názvu souboru a lékařského označení daného kloubu. 
+    názvu souboru a lékařského označení daného kloubu. Aktuální oblast k
+    vyřezání program ve snímku zvýrazní barevným rámečkem.
 -   Je ošetřeno, že nelze vyznačit více než 12 uvedených kloubů.
--   Všechny výřezy mají rozlišení 299 x 299 pixelů, což je vstupní
-    rozměr do neuronové sítě architektury Inception. K výřezům příliš
-    blízko okrajů, které by měly rozměr menší, se dolepí prázdné černé
+-   Všechny výřezy kloubů prstů mají rozlišení 299 x 299 pixelů, což je
+    vstupní rozměr do neuronové sítě architektury Inception. Kloub
+    zápěstní má větší rozměr 500 x 500 px. K výřezům příliš blízko
+    okrajů, které by jinak měly rozměr menší, se dolepí prázdné černé
     místo tak, aby zmíněné rozlišení zůstalo zachováno. Tuto funkci je
     možné vypnout nastavením příslušného parametru na False.
 -   Velikost výřezu je napevno nastavená v pixelech, protože všechny

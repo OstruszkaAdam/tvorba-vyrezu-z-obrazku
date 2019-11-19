@@ -106,7 +106,7 @@ def main():
             cv2.setMouseCallback("Snimek ke zpracovani", mouse_crop)
 
             cv2.waitKey(0)  # 0 = program ceka, dokud nestisknu libovolnou klavesu
-            if pocet_zpracovanych_kloubu != 0:
+            if pocet_zpracovanych_kloubu == 13:
                 zapsatPopiskyKvystupnimuSnimkuNaDisk(nazev_puvodniho_snimku_vcetne_cesty_k_nemu, souradnice_vsech_kloubu)
             # end if
             cv2.destroyWindow("Snimek ke zpracovani")
