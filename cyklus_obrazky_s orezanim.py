@@ -40,7 +40,10 @@ nazvy_vsech_kloubu = {
     8: "DIP-2",  # ukazovacek
     9: "DIP-3",  # prostrednicek
     10: "DIP-4",  # prstenicek
-    11: "DIP-5"  # malicek
+    11: "DIP-5",  # malicek
+
+    # zapesti
+    12: "zapesti"  # malicek
 }
 
 
@@ -84,8 +87,8 @@ def main():
             sirka_obrazku = np.size(snimek_puvodni, 1)
 
             if vyska_obrazku > 1000:
-                sirka_okna = round(sirka_obrazku * 0.6)
-                vyska_okna = round(vyska_obrazku * 0.6)
+                sirka_okna = round(sirka_obrazku * 0.5)
+                vyska_okna = round(vyska_obrazku * 0.5)
 
             else:
                 sirka_okna = sirka_obrazku
@@ -99,7 +102,9 @@ def main():
             cv2.setMouseCallback("Snimek ke zpracovani", mouse_crop)
 
             cv2.waitKey(0)  # 0 = program ceka, dokud nestisknu libovolnou klavesu
-            zapsatPopiskyKvystupnimuSnimkuNaDisk(nazev_puvodniho_snimku_vcetne_cesty_k_nemu, souradnice_vsech_kloubu)
+            if pocet_zpracovanych_kloubu != 0:
+                zapsatPopiskyKvystupnimuSnimkuNaDisk(nazev_puvodniho_snimku_vcetne_cesty_k_nemu, souradnice_vsech_kloubu)
+            # end if
             cv2.destroyWindow("Snimek ke zpracovani")
             cv2.destroyAllWindows()
 
@@ -107,6 +112,8 @@ def main():
 
         # end for
     # end for
+
+
 # end main
 
 #######################################################################################################################
@@ -120,21 +127,33 @@ def mouse_crop(event, x, y, flags, param):
     global souradnice_vsech_kloubu
 
     # pokud jsme zatim nedosahli mnozstvi kloubu ve snimku
-    if pocet_zpracovanych_kloubu < 12:
+    if pocet_zpracovanych_kloubu < 13:
         # (x, y) coordinates and indicate that cropping is being
         if event == cv2.EVENT_LBUTTONDOWN:
             cropping = True
             x_souradnice_kloubu, y_souradnice_kloubu = x, y
-            print("Souřadnice kloubu " + nazvy_vsech_kloubu[pocet_zpracovanych_kloubu] + " jsou: x = " + str(x_souradnice_kloubu) + " y = " + str(y_souradnice_kloubu))
+            print(str(pocet_zpracovanych_kloubu) + ". kloub v poradi je " + nazvy_vsech_kloubu[pocet_zpracovanych_kloubu]
+                  + ", jeho souradnice jsou: x = " + str(x_souradnice_kloubu) + " y = " + str(y_souradnice_kloubu))
+
 
         # if the left mouse button was released
         elif event == cv2.EVENT_LBUTTONUP:
-            souradnice_vsech_kloubu.update({nazvy_vsech_kloubu[pocet_zpracovanych_kloubu]: [x_souradnice_kloubu, y_souradnice_kloubu]})
+            souradnice_vsech_kloubu.update(
+                {nazvy_vsech_kloubu[pocet_zpracovanych_kloubu]: [x_souradnice_kloubu, y_souradnice_kloubu]})
             print(souradnice_vsech_kloubu)
 
-            # rozmery odpovidaji vstupnimu formatu inception, ktery je 299x299 px
-            x_start, y_start = x_souradnice_kloubu - 149, y_souradnice_kloubu - 149
-            x_end, y_end = x_souradnice_kloubu + 150, y_souradnice_kloubu + 150
+            # rozmery vyrezu kloubu na prstech odpovidaji vstupnimu formatu inception, ktery je 299x299 px
+            kratsi_polovina_strany = 149
+            delsi_polovina_strany = 150
+
+            # pokud ale jde o kloub zapesti, je nutne pouzi vetsi rozmer, aby se do vyrezu vubec vesel
+            if pocet_zpracovanych_kloubu == 12:
+                kratsi_polovina_strany = 249
+                delsi_polovina_strany = 250
+            # end if
+
+            x_start, y_start = x_souradnice_kloubu - kratsi_polovina_strany, y_souradnice_kloubu - kratsi_polovina_strany
+            x_end, y_end = x_souradnice_kloubu + delsi_polovina_strany, y_souradnice_kloubu + delsi_polovina_strany
 
             # osetreni, aby se souradnice nedostaly mimo obrazek (vadi pouze presah pod nulu)
             if x_start < 0:
@@ -147,7 +166,6 @@ def mouse_crop(event, x, y, flags, param):
             ref_point = [(x_start, y_start), (x_end, y_end)]
             roi = snimek_puvodni[ref_point[0][1]:ref_point[1][1], ref_point[0][0]:ref_point[1][0]]
 
-
             # pokud je vyrez udelany prilis blizko okraje puvodniho obrazku, je nutne k verzu pridat prazdne misto, aby zustal dodrzen format 299 x 299 px
             tloustka_horniho_ramecku = 0
             tloustka_leveho_ramecku = 0
@@ -159,29 +177,28 @@ def mouse_crop(event, x, y, flags, param):
 
             if dorovnavat_rozmery_na_ctverec:
                 # levy a horni ramecek
-                if x_souradnice_kloubu < 149:
-                    tloustka_leveho_ramecku = 149 - x_souradnice_kloubu
+                if x_souradnice_kloubu < kratsi_polovina_strany:
+                    tloustka_leveho_ramecku = kratsi_polovina_strany - x_souradnice_kloubu
                 # end if
-                if y_souradnice_kloubu < 149:
-                    tloustka_horniho_ramecku = 149 - y_souradnice_kloubu
+                if y_souradnice_kloubu < kratsi_polovina_strany:
+                    tloustka_horniho_ramecku = kratsi_polovina_strany - y_souradnice_kloubu
                 # end if
                 # pravy a dolni ramecek
-                if vzdalenost_k_okraji_prava < 150:
-                    tloustka_praveho_ramecku = 150 - vzdalenost_k_okraji_prava
+                if vzdalenost_k_okraji_prava < delsi_polovina_strany:
+                    tloustka_praveho_ramecku = delsi_polovina_strany - vzdalenost_k_okraji_prava
                 # end if
-                if vzdalenost_k_okraji_dolni < 150:
-                    tloustka_dolniho_ramecku = 150 - vzdalenost_k_okraji_dolni
+                if vzdalenost_k_okraji_dolni < delsi_polovina_strany:
+                    tloustka_dolniho_ramecku = delsi_polovina_strany - vzdalenost_k_okraji_dolni
                 # end if
-                roi = cv2.copyMakeBorder(roi, tloustka_horniho_ramecku, tloustka_dolniho_ramecku, tloustka_leveho_ramecku, tloustka_praveho_ramecku, cv2.BORDER_CONSTANT, value=[0, 0, 0])
+                roi = cv2.copyMakeBorder(roi, tloustka_horniho_ramecku, tloustka_dolniho_ramecku, tloustka_leveho_ramecku,
+                                         tloustka_praveho_ramecku, cv2.BORDER_CONSTANT, value=[0, 0, 0])
                 # cv2.copyMakeBorder(obrazek, horni, dolni, leva, prava ,typ_okraje, barva)
             # end if
 
-
             # cropping = False  # cropping is finished
 
-
             # tyhle dva radky prijdou asi smazat
-            cv2.imshow("Cropped image", roi)
+            # cv2.imshow("Cropped image", roi)
             # cv2.imwrite(cropped_image_name, roi)
 
             ulozitVystupniSnimek(nazev_puvodniho_snimku,
@@ -242,21 +259,22 @@ def ulozitVystupniSnimek(nazev_snimku, nazev_snimku_vcetne_cesty_k_nemu, oznacen
 def zapsatVystupniSnimekNaDisk(nazevVystupnihoSnimkuVcetneCestyKNemu, snimekKteryMaBytUlozen):
     cv2.imwrite(nazevVystupnihoSnimkuVcetneCestyKNemu, snimekKteryMaBytUlozen)
     print("uklada se soubor " + nazevVystupnihoSnimkuVcetneCestyKNemu)
-    print("")   # odradkovani
+    print("")  # odradkovani
+
 
 # end function
 
 
 #######################################################################################################################
 def zapsatPopiskyKvystupnimuSnimkuNaDisk(nazev_snimku_vcetne_cesty_k_nemu, souradnice_vsech_kloubu):
-
-    nazev_snimku_vcetne_cesty_ale_bez_pripony = nazev_snimku_vcetne_cesty_k_nemu.rsplit('.',1)[0] # odebrani obrazove pripony
-    nazev_soubory_s_popisky = nazev_snimku_vcetne_cesty_ale_bez_pripony + ".p" # pridani pripony formatu pickle
+    nazev_snimku_vcetne_cesty_ale_bez_pripony = nazev_snimku_vcetne_cesty_k_nemu.rsplit('.', 1)[0]  # odebrani obrazove pripony
+    nazev_soubory_s_popisky = nazev_snimku_vcetne_cesty_ale_bez_pripony + ".p"  # pridani pripony formatu pickle
     pickle.dump(souradnice_vsech_kloubu, open(
         nazev_soubory_s_popisky, "wb"))
 
     print("uklada se soubor " + nazev_soubory_s_popisky)
-    print("")   # odradkovani
+    print("")  # odradkovani
+
 
 # end function
 

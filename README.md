@@ -2,8 +2,8 @@ Program pro snadnou tvorbu výřezů kloubů z RTG snímků
 ========================================
 **Program projde jednotlivé snímky ve složce, uživatel klikáním myší
 vytváří ze snímku čtvercové výřezy (v předem daném pořadí). Je to
-nejrychlejší možný způsob vytváření výřezů. Program je určený k jedinému
-účelu – vytvořit z RTG snímků celých rukou nový dataset snímků
+nejrychlejší možný způsob vytváření výřezů. Program je plně podřízen
+jedinému účelu – vytvořit z RTG snímků celých rukou nový dataset snímků
 jednotlivých kloubů.**
 
 # Vstupy a výstupy
@@ -31,6 +31,7 @@ jednotlivých kloubů.**
    
    ![Klouby se označují v tomto pořadí](dokumentace/posloupnost-kliknuti.jpg)
 4. Na další snímek se přejde po stisknutí libovolné klávesy. 
+5. Pro projdutí všech snímků ve složce se program sám ukončí.
 
 # Podrobný popis funkčnosti
 -   V zadané složce i podložkách program hledá všechny soubory s
@@ -44,14 +45,18 @@ jednotlivých kloubů.**
     blízko okrajů, které by měly rozměr menší, se dolepí prázdné černé
     místo tak, aby zmíněné rozlišení zůstalo zachováno. Tuto funkci je
     možné vypnout nastavením příslušného parametru na False.
+-   Velikost výřezu je napevno nastavená v pixelech, protože všechny
+    snímky, na které je program určený, mají přibližně stejné rozměry.
+    Pokud by se objevily snímky s výrazně většími rozměry, bude potřeba
+    rozměr výřezu navázat relativně k rozměru snímku.
 -   Výřezy zachovávají původní příponu snímků (např. výřez z png bude
     opět png).
 -   Do složky se vstupním snímkem se ukládají i metadata – souřadnice
     označených kloubů. Souřadnice si knihovna OpenCV sama přepočítá z
     rozměrů okna se snímkem na rozměry skutečného snímku.
--   Metadata se ukládají ve formátu, který je čitelný
-    pouze strojově, a lze je přečíst v jiném programu napsaném v
-    Pythonu. Metadata se ukládají pomocí knihovny Pickle jako
+-   Metadata se ukládají ve formátu, který je čitelný pouze strojově, a
+    lze je přečíst v jiném programu napsaném v Pythonu (součástí tohoto
+    repozitáře). Metadata se ukládají pomocí knihovny Pickle jako
     serializovaný výstup programátorských objektů. Tyto objekty
     využívají datovou strukturu *slovník*. Pro jeden snímkem vznikne
     jeden slovník, kde klíčem je lékařská zkratka kloubu a hodnotou je
