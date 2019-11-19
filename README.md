@@ -11,9 +11,12 @@ jednotlivých kloubů.**
 -  Obrázek, resp. složka s obrázky
 
 ## Výstupy
--   Výřezy z obrázku (jeden výřez za každé kliknutí myší)
--   Soubor obsahující označené souřadnice kloubů pro případné další
-    zpracování nebo úpravy
+Pro každý jeden snímek:
+-   Výřezy kloubů (jeden výřez za každé kliknutí myší) – ukládají se do
+    výstupní složky
+-   Soubor obsahující souřadnice označených kloubů pro případné další
+    zpracování nebo úpravy – ukládá se do vstupní složky k původnímu
+    snímku
     
 # Ovládání programu
 1. Do kódu je potřeba zadat adresu složky se vstupními snímky a program
