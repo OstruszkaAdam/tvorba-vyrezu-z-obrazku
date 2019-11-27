@@ -60,7 +60,7 @@ def main():
             # nasetovani a vynulovani promennych
             global x_start, y_start, x_end, y_end, cropping
             x_start, y_start = 0, 0
-            x_end, y_end = 10,10
+            x_end, y_end = 10, 10
             global pocet_zpracovanych_kloubu, cropping, souradnice_vsech_kloubu
             cropping = False
             pocet_zpracovanych_kloubu = 0
@@ -90,28 +90,30 @@ def main():
             # zobrazit snimek (tak, aby se vesel na monitor) ##########################################################
             vyska_obrazku = np.size(snimek_puvodni, 0)
             sirka_obrazku = np.size(snimek_puvodni, 1)
+            print("rozmery jsou " + str(sirka_obrazku) + " x " + str(vyska_obrazku))
 
             if vyska_obrazku > 1000:
-                pomer_zmenseni = 0.5
-                sirka_okna = round(sirka_obrazku * pomer_zmenseni)
-                vyska_okna = round(vyska_obrazku * pomer_zmenseni)
+                vyska_okna = 1000   # vysku okna stanovim napevno
+                pomer_zmenseni = 1000 / vyska_obrazku   # vypocitam pomer zmenseni tak, aby odpovidal cilove vysce 1000 px
+                sirka_okna = round(sirka_obrazku * pomer_zmenseni)  # s pomerem nasledne dopocitam sirku
+
 
             else:
                 sirka_okna = sirka_obrazku
                 vyska_okna = vyska_obrazku
             # end if
 
-            cv2.namedWindow('Snimek ke zpracovani', cv2.WINDOW_NORMAL)  # cv2.WINDOW_NORMAL makes the output window resizealbe
-            cv2.resizeWindow('Snimek ke zpracovani', sirka_okna, vyska_okna)  # resize the window
+            cv2.namedWindow('Tvorba vyrezu kloubu', cv2.WINDOW_NORMAL)  # cv2.WINDOW_NORMAL makes the output window resizealbe
+            cv2.resizeWindow('Tvorba vyrezu kloubu', sirka_okna, vyska_okna)  # resize the window
 
-            cv2.imshow("Snimek ke zpracovani", snimek_puvodni)
-            cv2.setMouseCallback("Snimek ke zpracovani", mouse_crop)
+            cv2.imshow("Tvorba vyrezu kloubu", snimek_puvodni)
+            cv2.setMouseCallback("Tvorba vyrezu kloubu", mouse_crop)
 
             cv2.waitKey(0)  # 0 = program ceka, dokud nestisknu libovolnou klavesu
             if pocet_zpracovanych_kloubu == 13:
                 zapsatPopiskyKvystupnimuSnimkuNaDisk(nazev_puvodniho_snimku_vcetne_cesty_k_nemu, souradnice_vsech_kloubu)
             # end if
-            cv2.destroyWindow("Snimek ke zpracovani")
+            cv2.destroyWindow("Tvorba vyrezu kloubu")
             cv2.destroyAllWindows()
 
             # zpracovat snimek #########################################################################################
@@ -163,7 +165,7 @@ def mouse_crop(event, x, y, flags, param):
             cv2.rectangle(obrazek_ke_zobrazeni, (x_start, y_start), (x_end, y_end), (0.0, 165.0, 255.0), 2)
 
             # zobrazeni obrazku se zvyraznenym vyberem
-            cv2.imshow("Snimek ke zpracovani", obrazek_ke_zobrazeni)
+            cv2.imshow("Tvorba vyrezu kloubu", obrazek_ke_zobrazeni)
 
 
         # (x, y) coordinates and indicate that cropping is being
