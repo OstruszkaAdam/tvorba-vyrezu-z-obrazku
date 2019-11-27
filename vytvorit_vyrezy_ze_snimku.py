@@ -8,11 +8,17 @@ import pickle
 # INPUT_IMAGES_DIR = os.getcwd() + "/vstupy/"
 INPUT_IMAGES_DIR = "H:\MachineLearning\Dataset_02_trenovaci_diagnoza_orientace"
 # OUTPUT_DIR = os.getcwd() + "/vystupy/"
-OUTPUT_DIR = "H:\MachineLearning\Dataset_02_trenovaci_diagnoza_orientace\Rozrezane"
+
+output_dir_abs = "Rozrezane (ablsolutni rozmery)"
+output_dir_rel = "Rozrezane (relativni rozmery)"
+
+OUTPUT_DIR = os.path.join(INPUT_IMAGES_DIR, output_dir_abs)
+OUTPUT_DIR_REL = os.path.join(INPUT_IMAGES_DIR, output_dir_rel)
 
 pocet_zpracovanych_kloubu = 0
 x_souradnice_kloubu, y_souradnice_kloubu = 0, 0
 cropping = False
+relativni_velikost_vyrezu = False
 
 dorovnavat_rozmery_na_ctverec = True
 
@@ -137,6 +143,11 @@ def mouse_crop(event, x, y, flags, param):
 
     obrazek_ke_zobrazeni = snimek_puvodni.copy()
 
+    # podklady pro vypocet relativnich rozmeru vyrezu
+    sirka_obrazku = np.size(snimek_puvodni, 1)
+    rozmer_vyrezu_kloubu_prstu = round(sirka_obrazku * 0.18)
+    rozmer_vyrezu_kloubu_zapesti = round(sirka_obrazku * 0.3)
+
     # pokud jsme zatim nedosahli mnozstvi kloubu ve snimku
     if pocet_zpracovanych_kloubu < 13:
 
@@ -144,25 +155,42 @@ def mouse_crop(event, x, y, flags, param):
         kratsi_polovina_strany = 149
         delsi_polovina_strany = 150
 
+        #relativni rozmery
+        kratsi_polovina_strany_rel = round(rozmer_vyrezu_kloubu_prstu / 2) - 1
+        delsi_polovina_strany_rel = round(rozmer_vyrezu_kloubu_prstu / 2)
+
         # pokud ale jde o kloub zapesti, je nutne pouzi vetsi rozmer, aby se do vyrezu vubec vesel
         if pocet_zpracovanych_kloubu == 12:
             kratsi_polovina_strany = 249
             delsi_polovina_strany = 250
+
+            # relativni rozmery
+            kratsi_polovina_strany_rel = round(rozmer_vyrezu_kloubu_zapesti / 2) - 1
+            delsi_polovina_strany_rel = round(rozmer_vyrezu_kloubu_zapesti / 2)
         # end if
 
         if event == cv2.EVENT_MOUSEMOVE:
             x_start, y_start = x - kratsi_polovina_strany, y - kratsi_polovina_strany
             x_end, y_end = x + delsi_polovina_strany, y + delsi_polovina_strany
 
-            # barevne zvyrazneni vnitrku vyberu
-            cv2.rectangle(obrazek_ke_zobrazeni, (x_start, y_start), (x_end, y_end), (0.0, 165.0, 255.0), -1)
 
-            # pridani polopruhledneho vyberu k puvodnimu obrzaku
+            x_start_rel, y_start_rel = x - kratsi_polovina_strany_rel, y - kratsi_polovina_strany_rel
+            x_end_rel, y_end_rel = x + delsi_polovina_strany_rel, y + delsi_polovina_strany_rel
+
+
+            # barevne zvyrazneni vnitrku vyberu
+            # cv2.rectangle(obrazek_ke_zobrazeni, (x_start, y_start), (x_end, y_end), (0.0, 165.0, 255.0), -1)    # absolutni rozmery
+            cv2.rectangle(obrazek_ke_zobrazeni, (x_start_rel, y_start_rel), (x_end_rel, y_end_rel), (0.0, 165.0, 255.0), -1)
+
+            # pridani polopruhledneho vyberu k puvodnimu obrazku
             mira_pruhlednosti = 0.75
             obrazek_ke_zobrazeni = cv2.addWeighted(obrazek_ke_zobrazeni, 1 - mira_pruhlednosti, snimek_puvodni, mira_pruhlednosti, 0)
 
-            # ohraniceni vyberu
+            # ohraniceni vyberu s absolutnim rozmerem
             cv2.rectangle(obrazek_ke_zobrazeni, (x_start, y_start), (x_end, y_end), (0.0, 165.0, 255.0), 2)
+
+            # ohraniceni vyberu s relativnim rozmerem
+            cv2.rectangle(obrazek_ke_zobrazeni, (x_start_rel, y_start_rel), (x_end_rel, y_end_rel), (0.0, 165.0, 255.0), 2)
 
             # zobrazeni obrazku se zvyraznenym vyberem
             cv2.imshow("Tvorba vyrezu kloubu", obrazek_ke_zobrazeni)
@@ -184,6 +212,9 @@ def mouse_crop(event, x, y, flags, param):
             x_start, y_start = x_souradnice_kloubu - kratsi_polovina_strany, y_souradnice_kloubu - kratsi_polovina_strany
             x_end, y_end = x_souradnice_kloubu + delsi_polovina_strany, y_souradnice_kloubu + delsi_polovina_strany
 
+            x_start_rel, y_start_rel = x - kratsi_polovina_strany_rel, y - kratsi_polovina_strany_rel
+            x_end_rel, y_end_rel = x + delsi_polovina_strany_rel, y + delsi_polovina_strany_rel
+
             # osetreni, aby se souradnice nedostaly mimo obrazek (vadi pouze presah pod nulu)
             if x_start < 0:
                 x_start = 0
@@ -195,6 +226,9 @@ def mouse_crop(event, x, y, flags, param):
             ref_point = [(x_start, y_start), (x_end, y_end)]
             roi = snimek_puvodni[ref_point[0][1]:ref_point[1][1], ref_point[0][0]:ref_point[1][0]]
 
+            ref_point_rel = [(x_start_rel, y_start_rel), (x_end_rel, y_end_rel)]
+            roi_rel = snimek_puvodni[ref_point_rel[0][1]:ref_point_rel[1][1], ref_point_rel[0][0]:ref_point_rel[1][0]]
+
             # pokud je vyrez udelany prilis blizko okraje puvodniho obrazku, je nutne k verzu pridat prazdne misto, aby zustal dodrzen format 299 x 299 px
             tloustka_horniho_ramecku = 0
             tloustka_leveho_ramecku = 0
@@ -205,6 +239,8 @@ def mouse_crop(event, x, y, flags, param):
             vzdalenost_k_okraji_dolni = np.size(snimek_puvodni, 0) - y_souradnice_kloubu
 
             if dorovnavat_rozmery_na_ctverec:
+                # absolutni rozmery
+
                 # levy a horni ramecek
                 if x_souradnice_kloubu < kratsi_polovina_strany:
                     tloustka_leveho_ramecku = kratsi_polovina_strany - x_souradnice_kloubu
@@ -222,6 +258,27 @@ def mouse_crop(event, x, y, flags, param):
                 roi = cv2.copyMakeBorder(roi, tloustka_horniho_ramecku, tloustka_dolniho_ramecku, tloustka_leveho_ramecku,
                                          tloustka_praveho_ramecku, cv2.BORDER_CONSTANT, value=[0, 0, 0])
                 # cv2.copyMakeBorder(obrazek, horni, dolni, leva, prava ,typ_okraje, barva)
+
+                # relativni rozmery
+
+                # levy a horni ramecek
+                if x_souradnice_kloubu < kratsi_polovina_strany:
+                    tloustka_leveho_ramecku = kratsi_polovina_strany_rel - x_souradnice_kloubu
+                # end if
+                if y_souradnice_kloubu < kratsi_polovina_strany:
+                    tloustka_horniho_ramecku = kratsi_polovina_strany_rel - y_souradnice_kloubu
+                # end if
+                # pravy a dolni ramecek
+                if vzdalenost_k_okraji_prava < delsi_polovina_strany_rel:
+                    tloustka_praveho_ramecku = delsi_polovina_strany_rel - vzdalenost_k_okraji_prava
+                # end if
+                if vzdalenost_k_okraji_dolni < delsi_polovina_strany_rel:
+                    tloustka_dolniho_ramecku = delsi_polovina_strany_rel - vzdalenost_k_okraji_dolni
+                # end if
+                roi_rel = cv2.copyMakeBorder(roi_rel, tloustka_horniho_ramecku, tloustka_dolniho_ramecku, tloustka_leveho_ramecku,
+                                         tloustka_praveho_ramecku, cv2.BORDER_CONSTANT, value=[0, 0, 0])
+                # cv2.copyMakeBorder(obrazek, horni, dolni, leva, prava ,typ_okraje, barva)
+
             # end if
 
             # cropping = False  # cropping is finished
@@ -230,10 +287,11 @@ def mouse_crop(event, x, y, flags, param):
             # cv2.imshow("Cropped image", roi)
             # cv2.imwrite(cropped_image_name, roi)
 
-            ulozitVystupniSnimek(nazev_puvodniho_snimku,
+            ulozitVystupniSnimky(nazev_puvodniho_snimku,
                                  nazev_puvodniho_snimku_vcetne_cesty_k_nemu,
                                  nazvy_vsech_kloubu[pocet_zpracovanych_kloubu],
-                                 roi)
+                                 roi, roi_rel)
+
 
             x_souradnice_kloubu, y_souradnice_kloubu = 0, 0
             cropping = False  # cropping is finished
@@ -278,6 +336,52 @@ def ulozitVystupniSnimek(nazev_snimku, nazev_snimku_vcetne_cesty_k_nemu, oznacen
 
         nazevVystupnihoSnimku = cilovaSlozkaVcetnePodslozky + nazevSnimkuBezPripony + "_" + oznaceni_kloubu + PouzePripona
         zapsatVystupniSnimekNaDisk(nazevVystupnihoSnimku, snimek_k_ulozeni)
+    # end if
+
+
+# end function
+
+#######################################################################################################################
+def ulozitVystupniSnimky(nazev_snimku, nazev_snimku_vcetne_cesty_k_nemu, oznaceni_kloubu, snimek_k_ulozeni, snimek_k_ulozeni2):
+    # oriznuti pripony z nazvu souboru
+    nazevSnimkuBezPripony = os.path.splitext(nazev_snimku)[0]
+    # vyjmuti samotne pripony
+    PouzePripona = os.path.splitext(nazev_snimku)[1]
+
+    cestaDoSlozkySeSnimkem = os.path.dirname(nazev_snimku_vcetne_cesty_k_nemu) + "/"  # ziskani cesty do slozky se snimkem
+
+    # pokud se cesta ke snimku rovna ceste ke vstupni slozce (tzn. snimek uz neni dale zanoreny do podslozek)
+    if cestaDoSlozkySeSnimkem == INPUT_IMAGES_DIR:
+        # jenom zpracovat snimek BEZ zpracovani jmena podslozky
+
+        nazevVystupnihoSnimku = OUTPUT_DIR + nazevSnimkuBezPripony + "_" + oznaceni_kloubu + PouzePripona
+        zapsatVystupniSnimekNaDisk(nazevVystupnihoSnimku, snimek_k_ulozeni)
+
+        nazevVystupnihoSnimku2 = OUTPUT_DIR_REL + nazevSnimkuBezPripony + "_" + oznaceni_kloubu + "_relativni_velikost_" + PouzePripona
+        zapsatVystupniSnimekNaDisk(nazevVystupnihoSnimku2, snimek_k_ulozeni2)
+
+    # pokud snimek je dale zanoreny do podslozek
+    else:
+        # zpracovat snimek a zpracovat i jmeno podslozky (tzn. vytvorit ji v cilovem umisteni)
+
+        # ziskani nazvu podslozky, ve ktere je snimek umisteny
+        cestaDoSlozkySeSnimkem = os.path.dirname(nazev_snimku_vcetne_cesty_k_nemu)  # ziskani cesty do slozky se snimkem
+        nazevPodslozkySeSnimky = os.path.split(cestaDoSlozkySeSnimkem)[1]  # ziskani nazvu pouze posledni slozky
+
+        # vytvoreni podlozky v cilove slozky (pokud jeste neexistuje)
+        cilovaSlozkaVcetnePodslozky = OUTPUT_DIR + "/" + nazevPodslozkySeSnimky + "/"
+        if not os.path.exists(cilovaSlozkaVcetnePodslozky):
+            os.makedirs(cilovaSlozkaVcetnePodslozky)
+
+        cilovaSlozkaVcetnePodslozky_rel = OUTPUT_DIR_REL + "/" + nazevPodslozkySeSnimky + "/"
+        if not os.path.exists(cilovaSlozkaVcetnePodslozky_rel):
+            os.makedirs(cilovaSlozkaVcetnePodslozky_rel)
+
+        nazevVystupnihoSnimku = cilovaSlozkaVcetnePodslozky + nazevSnimkuBezPripony + "_" + oznaceni_kloubu + PouzePripona
+        zapsatVystupniSnimekNaDisk(nazevVystupnihoSnimku, snimek_k_ulozeni)
+
+        nazevVystupnihoSnimku2 = cilovaSlozkaVcetnePodslozky_rel + nazevSnimkuBezPripony + "_" + oznaceni_kloubu + "_relativni_velikost_" + PouzePripona
+        zapsatVystupniSnimekNaDisk(nazevVystupnihoSnimku2, snimek_k_ulozeni2)
     # end if
 
 

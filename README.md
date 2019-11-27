@@ -10,13 +10,16 @@ jednotlivých kloubů.**
 ## Vstupy
 -  Obrázek, resp. složka s obrázky k rozřezání. (Program automaticky
    zahrne do zpracování i snímky v podložkách.)
--  Složka, do které se mají výřezy ukládat (Podložky si program
-   automaticky vytvoří.)
+
 
 ## Výstupy
 Pro každý jeden snímek:
--   Výřezy kloubů (jeden výřez za každé kliknutí myší) – ukládají se do
-    výstupní složky
+-   Výřezy kloubů (jeden výřez za každé kliknutí myší). Každý výřez se
+    ukládá ve dvou velikostech, a to
+    - absolutní velikost 299 x 299 px, se kterou pracuje Inception
+    - relativní velikost vypočítaná podle velikosti původního snímku
+-   Výřezy se ukládají do dvou výstupních složek podle velikosti. Tyto
+    složky si program sám vytvoří v zadané složce se vstupními snímky.
 -   Soubor obsahující souřadnice označených kloubů pro případné další
     zpracování nebo úpravy – ukládá se do vstupní složky k původnímu
     snímku
@@ -48,12 +51,16 @@ Pro každý jeden snímek:
     názvu souboru a lékařského označení daného kloubu. Aktuální oblast k
     vyřezání program ve snímku zvýrazní barevným rámečkem.
 -   Je ošetřeno, že nelze vyznačit více než 12 uvedených kloubů.
--   Všechny výřezy kloubů prstů mají rozlišení 299 x 299 pixelů, což je
-    vstupní rozměr do neuronové sítě architektury Inception. Kloub
-    zápěstní má větší rozměr 500 x 500 px. K výřezům příliš blízko
-    okrajů, které by jinak měly rozměr menší, se dolepí prázdné černé
-    místo tak, aby zmíněné rozlišení zůstalo zachováno. Tuto funkci je
-    možné vypnout nastavením příslušného parametru na False.
+-   Všechny výřezy kloubů prstů mají rozlišení (absolutní) 299 x 299
+    pixelů, což je vstupní rozměr do neuronové sítě architektury
+    Inception. Kloub zápěstní má větší (absolutní) rozměr 500 x 500 px.
+    Relativní rozměry se vypočítávají jako určité % z rozměru původního
+    snímku. % bylo stanoveno pokusem, není za tím schovaná žádná
+    pokročilejší metoda (i když by to asi bylo žádoucí).
+-   K výřezům příliš blízko okrajů, které by jinak měly rozměr menší, se
+    dolepí prázdné černé místo tak, aby zmíněné rozlišení zůstalo
+    zachováno. Tuto funkci je možné vypnout nastavením příslušného
+    parametru na False.
 -   Velikost výřezu je napevno nastavená v pixelech, protože všechny
     snímky, na které je program určený, mají přibližně stejné rozměry.
     Pokud by se objevily snímky s výrazně většími rozměry, bude potřeba
