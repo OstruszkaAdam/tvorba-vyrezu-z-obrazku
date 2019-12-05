@@ -6,7 +6,7 @@ import pickle
 
 # module-level variables ##############################################################################################
 # INPUT_IMAGES_DIR = os.getcwd() + "/vstupy/"
-INPUT_IMAGES_DIR = "H:\MachineLearning\OZ_nove datasety_leto2019\_roztridene ruce\_NEART\_1-3-2018_31-3-2018"
+INPUT_IMAGES_DIR = "H:\MachineLearning\OZ_nove datasety_leto2019\_roztridene ruce\_NEART\_1-3-2018_31-3-2018\znova"
 # OUTPUT_DIR = os.getcwd() + "/vystupy/"
 
 output_dir_abs = "Rozrezane (ablsolutni rozmery)"
@@ -240,42 +240,18 @@ def mouse_crop(event, x, y, flag=0, param=None):
                 # absolutni rozmery
 
                 # levy a horni ramecek
-                if x_souradnice_kloubu < kratsi_polovina_strany:
-                    tloustka_leveho_ramecku = kratsi_polovina_strany - x_souradnice_kloubu
-                # end if
-                if y_souradnice_kloubu < kratsi_polovina_strany:
-                    tloustka_horniho_ramecku = kratsi_polovina_strany - y_souradnice_kloubu
-                # end if
-                # pravy a dolni ramecek
-                if vzdalenost_k_okraji_prava < delsi_polovina_strany:
-                    tloustka_praveho_ramecku = delsi_polovina_strany - vzdalenost_k_okraji_prava
-                # end if
-                if vzdalenost_k_okraji_dolni < delsi_polovina_strany:
-                    tloustka_dolniho_ramecku = delsi_polovina_strany - vzdalenost_k_okraji_dolni
-                # end if
-                roi = cv2.copyMakeBorder(roi, tloustka_horniho_ramecku, tloustka_dolniho_ramecku, tloustka_leveho_ramecku,
-                                         tloustka_praveho_ramecku, cv2.BORDER_CONSTANT, value=[0, 0, 0])
-                # cv2.copyMakeBorder(obrazek, horni, dolni, leva, prava ,typ_okraje, barva)
+                roi = spocitat_rozmery_a_vytvorit_vyrez(
+                    delsi_polovina_strany, kratsi_polovina_strany, roi, tloustka_dolniho_ramecku, tloustka_horniho_ramecku,
+                    tloustka_leveho_ramecku, tloustka_praveho_ramecku, vzdalenost_k_okraji_dolni, vzdalenost_k_okraji_prava,
+                    x_souradnice_kloubu, y_souradnice_kloubu)
 
                 # relativni rozmery
 
                 # levy a horni ramecek
-                if x_souradnice_kloubu < kratsi_polovina_strany:
-                    tloustka_leveho_ramecku = kratsi_polovina_strany_rel - x_souradnice_kloubu
-                # end if
-                if y_souradnice_kloubu < kratsi_polovina_strany:
-                    tloustka_horniho_ramecku = kratsi_polovina_strany_rel - y_souradnice_kloubu
-                # end if
-                # pravy a dolni ramecek
-                if vzdalenost_k_okraji_prava < delsi_polovina_strany_rel:
-                    tloustka_praveho_ramecku = delsi_polovina_strany_rel - vzdalenost_k_okraji_prava
-                # end if
-                if vzdalenost_k_okraji_dolni < delsi_polovina_strany_rel:
-                    tloustka_dolniho_ramecku = delsi_polovina_strany_rel - vzdalenost_k_okraji_dolni
-                # end if
-                roi_rel = cv2.copyMakeBorder(roi_rel, tloustka_horniho_ramecku, tloustka_dolniho_ramecku, tloustka_leveho_ramecku,
-                                         tloustka_praveho_ramecku, cv2.BORDER_CONSTANT, value=[0, 0, 0])
-                # cv2.copyMakeBorder(obrazek, horni, dolni, leva, prava ,typ_okraje, barva)
+                roi_rel = spocitat_rozmery_a_vytvorit_vyrez(
+                    delsi_polovina_strany_rel, kratsi_polovina_strany_rel, roi_rel, tloustka_dolniho_ramecku, tloustka_horniho_ramecku,
+                    tloustka_leveho_ramecku, tloustka_praveho_ramecku, vzdalenost_k_okraji_dolni, vzdalenost_k_okraji_prava,
+                    x_souradnice_kloubu, y_souradnice_kloubu)
 
             # end if
 
@@ -301,6 +277,29 @@ def mouse_crop(event, x, y, flag=0, param=None):
             print("Prejdete na dalsi snimek")
             print("")
     # end if
+
+#######################################################################################################################
+def spocitat_rozmery_a_vytvorit_vyrez(delsi_polovina_strany, kratsi_polovina_strany, roi, tloustka_dolniho_ramecku, tloustka_horniho_ramecku,
+                                      tloustka_leveho_ramecku, tloustka_praveho_ramecku, vzdalenost_k_okraji_dolni, vzdalenost_k_okraji_prava,
+                                      x_souradnice_kloubu, y_souradnice_kloubu):
+    if x_souradnice_kloubu < kratsi_polovina_strany:
+        tloustka_leveho_ramecku = kratsi_polovina_strany - x_souradnice_kloubu
+    # end if
+    if y_souradnice_kloubu < kratsi_polovina_strany:
+        tloustka_horniho_ramecku = kratsi_polovina_strany - y_souradnice_kloubu
+    # end if
+    # pravy a dolni ramecek
+    if vzdalenost_k_okraji_prava < delsi_polovina_strany:
+        tloustka_praveho_ramecku = delsi_polovina_strany - vzdalenost_k_okraji_prava
+    # end if
+    if vzdalenost_k_okraji_dolni < delsi_polovina_strany:
+        tloustka_dolniho_ramecku = delsi_polovina_strany - vzdalenost_k_okraji_dolni
+    # end if
+    roi = cv2.copyMakeBorder(roi, tloustka_horniho_ramecku, tloustka_dolniho_ramecku, tloustka_leveho_ramecku,
+                             tloustka_praveho_ramecku, cv2.BORDER_CONSTANT, value=[0, 0, 0])
+    # cv2.copyMakeBorder(obrazek, horni, dolni, leva, prava ,typ_okraje, barva)
+    return roi
+
 
 #######################################################################################################################
 def get_coordinates_and_refresh_screen(delsi_polovina_strany, delsi_polovina_strany_rel, kolik_oriznout_z_vyberu,
@@ -372,7 +371,8 @@ def ulozitVystupniSnimky(nazev_snimku, nazev_snimku_vcetne_cesty_k_nemu, oznacen
     # oriznuti pripony z nazvu souboru
     nazevSnimkuBezPripony = os.path.splitext(nazev_snimku)[0]
     # vyjmuti samotne pripony
-    PouzePripona = os.path.splitext(nazev_snimku)[1]
+    # PouzePripona = os.path.splitext(nazev_snimku)[1]
+    PouzePripona = ".png"
 
     cestaDoSlozkySeSnimkem = os.path.dirname(nazev_snimku_vcetne_cesty_k_nemu) + "/"  # ziskani cesty do slozky se snimkem
 
