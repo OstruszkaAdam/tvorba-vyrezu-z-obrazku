@@ -6,7 +6,7 @@ import pickle
 
 # module-level variables ##############################################################################################
 # INPUT_IMAGES_DIR = os.getcwd() + "/vstupy/"
-INPUT_IMAGES_DIR = "H:\MachineLearning\Dataset_02_trenovaci_diagnoza_orientace"
+INPUT_IMAGES_DIR = "H:\MachineLearning\OZ_nove datasety_leto2019\_roztridene ruce\_NEART\_1-3-2018_31-3-2018"
 # OUTPUT_DIR = os.getcwd() + "/vystupy/"
 
 output_dir_abs = "Rozrezane (ablsolutni rozmery)"
@@ -14,6 +14,8 @@ output_dir_rel = "Rozrezane (relativni rozmery)"
 
 OUTPUT_DIR = os.path.join(INPUT_IMAGES_DIR, output_dir_abs)
 OUTPUT_DIR_REL = os.path.join(INPUT_IMAGES_DIR, output_dir_rel)
+
+kolik_oriznout_z_vyberu = 0
 
 pocet_zpracovanych_kloubu = 0
 x_souradnice_kloubu, y_souradnice_kloubu = 0, 0
@@ -131,7 +133,7 @@ def main():
 # end main
 
 #######################################################################################################################
-def mouse_crop(event, x, y, flags, param):
+def mouse_crop(event, x, y, flag=0, param=None):
     # grab references to the global variables
     global pocet_zpracovanych_kloubu
     global x_start, y_start, x_end, y_end, cropping
@@ -169,31 +171,27 @@ def mouse_crop(event, x, y, flags, param):
             delsi_polovina_strany_rel = round(rozmer_vyrezu_kloubu_zapesti / 2)
         # end if
 
-        if event == cv2.EVENT_MOUSEMOVE:
-            x_start, y_start = x - kratsi_polovina_strany, y - kratsi_polovina_strany
-            x_end, y_end = x + delsi_polovina_strany, y + delsi_polovina_strany
+        global kolik_oriznout_z_vyberu
+
+        if event == cv2.EVENT_MOUSEWHEEL:
+            if flag > 0:  # Scroll up
+                kolik_oriznout_z_vyberu = kolik_oriznout_z_vyberu + 5
+                get_coordinates_and_refresh_screen(delsi_polovina_strany, delsi_polovina_strany_rel, kolik_oriznout_z_vyberu,
+                                                   kratsi_polovina_strany, kratsi_polovina_strany_rel, obrazek_ke_zobrazeni,
+                                                   snimek_puvodni, x, y)
+
+            elif flag < 0:  # Scroll down
+                kolik_oriznout_z_vyberu = kolik_oriznout_z_vyberu - 5
+                get_coordinates_and_refresh_screen(delsi_polovina_strany, delsi_polovina_strany_rel, kolik_oriznout_z_vyberu,
+                                                   kratsi_polovina_strany, kratsi_polovina_strany_rel, obrazek_ke_zobrazeni,
+                                                   snimek_puvodni, x, y)
 
 
-            x_start_rel, y_start_rel = x - kratsi_polovina_strany_rel, y - kratsi_polovina_strany_rel
-            x_end_rel, y_end_rel = x + delsi_polovina_strany_rel, y + delsi_polovina_strany_rel
+        elif event == cv2.EVENT_MOUSEMOVE:
 
-
-            # barevne zvyrazneni vnitrku vyberu
-            # cv2.rectangle(obrazek_ke_zobrazeni, (x_start, y_start), (x_end, y_end), (0.0, 165.0, 255.0), -1)    # absolutni rozmery
-            cv2.rectangle(obrazek_ke_zobrazeni, (x_start_rel, y_start_rel), (x_end_rel, y_end_rel), (0.0, 165.0, 255.0), -1)
-
-            # pridani polopruhledneho vyberu k puvodnimu obrazku
-            mira_pruhlednosti = 0.75
-            obrazek_ke_zobrazeni = cv2.addWeighted(obrazek_ke_zobrazeni, 1 - mira_pruhlednosti, snimek_puvodni, mira_pruhlednosti, 0)
-
-            # ohraniceni vyberu s absolutnim rozmerem
-            cv2.rectangle(obrazek_ke_zobrazeni, (x_start, y_start), (x_end, y_end), (0.0, 165.0, 255.0), 2)
-
-            # ohraniceni vyberu s relativnim rozmerem
-            cv2.rectangle(obrazek_ke_zobrazeni, (x_start_rel, y_start_rel), (x_end_rel, y_end_rel), (0.0, 165.0, 255.0), 2)
-
-            # zobrazeni obrazku se zvyraznenym vyberem
-            cv2.imshow("Tvorba vyrezu kloubu", obrazek_ke_zobrazeni)
+            get_coordinates_and_refresh_screen(delsi_polovina_strany, delsi_polovina_strany_rel, kolik_oriznout_z_vyberu,
+                                               kratsi_polovina_strany, kratsi_polovina_strany_rel, obrazek_ke_zobrazeni,
+                                               snimek_puvodni, x, y)
 
 
         # (x, y) coordinates and indicate that cropping is being
@@ -209,11 +207,11 @@ def mouse_crop(event, x, y, flags, param):
                 {nazvy_vsech_kloubu[pocet_zpracovanych_kloubu]: [x_souradnice_kloubu, y_souradnice_kloubu]})
             print(souradnice_vsech_kloubu)
 
-            x_start, y_start = x_souradnice_kloubu - kratsi_polovina_strany, y_souradnice_kloubu - kratsi_polovina_strany
-            x_end, y_end = x_souradnice_kloubu + delsi_polovina_strany, y_souradnice_kloubu + delsi_polovina_strany
+            x_start, y_start = x - kratsi_polovina_strany, y - kratsi_polovina_strany
+            x_end, y_end = x + delsi_polovina_strany, y + delsi_polovina_strany
 
-            x_start_rel, y_start_rel = x - kratsi_polovina_strany_rel, y - kratsi_polovina_strany_rel
-            x_end_rel, y_end_rel = x + delsi_polovina_strany_rel, y + delsi_polovina_strany_rel
+            x_start_rel, y_start_rel = x - (kratsi_polovina_strany_rel + kolik_oriznout_z_vyberu), y - (kratsi_polovina_strany_rel + kolik_oriznout_z_vyberu)
+            x_end_rel, y_end_rel = x + delsi_polovina_strany_rel + kolik_oriznout_z_vyberu, y + delsi_polovina_strany_rel + kolik_oriznout_z_vyberu
 
             # osetreni, aby se souradnice nedostaly mimo obrazek (vadi pouze presah pod nulu)
             if x_start < 0:
@@ -303,6 +301,34 @@ def mouse_crop(event, x, y, flags, param):
             print("Prejdete na dalsi snimek")
             print("")
     # end if
+
+#######################################################################################################################
+def get_coordinates_and_refresh_screen(delsi_polovina_strany, delsi_polovina_strany_rel, kolik_oriznout_z_vyberu,
+                                       kratsi_polovina_strany, kratsi_polovina_strany_rel, obrazek_ke_zobrazeni, snimek_puvodni,
+                                       x, y):
+    global x_start, y_start, x_end, y_end
+    x_start, y_start = x - kratsi_polovina_strany, y - kratsi_polovina_strany
+    x_end, y_end = x + delsi_polovina_strany, y + delsi_polovina_strany
+    x_start_rel, y_start_rel = x - (kratsi_polovina_strany_rel + kolik_oriznout_z_vyberu), y - (
+                kratsi_polovina_strany_rel + kolik_oriznout_z_vyberu)
+    x_end_rel, y_end_rel = x + delsi_polovina_strany_rel + kolik_oriznout_z_vyberu, y + delsi_polovina_strany_rel + kolik_oriznout_z_vyberu
+
+    x_start_rel_orig, y_start_rel_orig = x - kratsi_polovina_strany_rel, y - kratsi_polovina_strany_rel
+    x_end_rel_orig, y_end_rel_orig = x + delsi_polovina_strany_rel, y + delsi_polovina_strany_rel
+
+    # barevne zvyrazneni vnitrku vyberu
+    # cv2.rectangle(obrazek_ke_zobrazeni, (x_start, y_start), (x_end, y_end), (0.0, 165.0, 255.0), -1)    # absolutni rozmery
+    cv2.rectangle(obrazek_ke_zobrazeni, (x_start_rel, y_start_rel), (x_end_rel, y_end_rel), (0.0, 165.0, 255.0), -1)
+    # pridani polopruhledneho vyberu k puvodnimu obrazku
+    mira_pruhlednosti = 0.75
+    obrazek_ke_zobrazeni = cv2.addWeighted(obrazek_ke_zobrazeni, 1 - mira_pruhlednosti, snimek_puvodni, mira_pruhlednosti, 0)
+    # ohraniceni vyberu s absolutnim rozmerem
+    cv2.rectangle(obrazek_ke_zobrazeni, (x_start, y_start), (x_end, y_end), (150.0, 150.0, 150.0), 2)
+    # ohraniceni vyberu s relativnim rozmerem
+    cv2.rectangle(obrazek_ke_zobrazeni, (x_start_rel, y_start_rel), (x_end_rel, y_end_rel), (0.0, 165.0, 255.0), 2)
+    cv2.rectangle(obrazek_ke_zobrazeni, (x_start_rel_orig, y_start_rel_orig), (x_end_rel_orig, y_end_rel_orig), (150.0, 150.0, 150.0), 2)
+    # zobrazeni obrazku se zvyraznenym vyberem
+    cv2.imshow("Tvorba vyrezu kloubu", obrazek_ke_zobrazeni)
 
 
 #######################################################################################################################

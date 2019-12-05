@@ -30,7 +30,7 @@ Pro každý jeden snímek:
 2. Program postupně prochází a zobrazuje jednotlivé snímky ve složce.
    Klikáním myší se označují klouby. Ke každému kliknutí program vytvoří
    výřez označeného kloubu a bokem uloží jeho souřadnice pro případné
-   další využití. 
+   další využití. Kolečkem myši je možné měnit velikost výřezu.
 3. Klouby se automaticky pojmenovávají v pořadí zobrazeném na obrázku
    níže. Toto pořadí je při klikání nutné dodržet, jinak budou výřezy
    pojmenované špatně. Pokud nějaký kloub na snímku ruky chybí (amputace
@@ -56,15 +56,12 @@ Pro každý jeden snímek:
     Inception. Kloub zápěstní má větší (absolutní) rozměr 500 x 500 px.
     Relativní rozměry se vypočítávají jako určité % z rozměru původního
     snímku. % bylo stanoveno pokusem, není za tím schovaná žádná
-    pokročilejší metoda (i když by to asi bylo žádoucí).
+    pokročilejší metoda (i když by to asi bylo žádoucí). Velikost
+    relativního výřezu je možné měnit kolečkem myši.
 -   K výřezům příliš blízko okrajů, které by jinak měly rozměr menší, se
     dolepí prázdné černé místo tak, aby zmíněné rozlišení zůstalo
     zachováno. Tuto funkci je možné vypnout nastavením příslušného
     parametru na False.
--   Velikost výřezu je napevno nastavená v pixelech, protože všechny
-    snímky, na které je program určený, mají přibližně stejné rozměry.
-    Pokud by se objevily snímky s výrazně většími rozměry, bude potřeba
-    rozměr výřezu navázat relativně k rozměru snímku.
 -   Výřezy zachovávají původní příponu snímků (např. výřez z png bude
     opět png).
 -   Do složky se vstupním snímkem se ukládají i metadata – souřadnice
