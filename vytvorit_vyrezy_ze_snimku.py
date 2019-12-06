@@ -6,7 +6,7 @@ import pickle
 
 # module-level variables ##############################################################################################
 # INPUT_IMAGES_DIR = os.getcwd() + "/vstupy/"
-INPUT_IMAGES_DIR = "H:\MachineLearning\OZ_nove datasety_leto2019\_roztridene ruce\_NEART\_1-7-2018_31-7-2018"
+INPUT_IMAGES_DIR = "H:\MachineLearning\OZ_nove datasety_leto2019\_roztridene ruce\_NEART\_1-12-2017_28-2-2018"
 # OUTPUT_DIR = os.getcwd() + "/vystupy/"
 
 output_dir_abs = "Rozrezane (ablsolutni rozmery)"
@@ -319,16 +319,25 @@ def get_coordinates_and_refresh_screen(delsi_polovina_strany, delsi_polovina_str
     x_start_rel_orig, y_start_rel_orig = x - kratsi_polovina_strany_rel, y - kratsi_polovina_strany_rel
     x_end_rel_orig, y_end_rel_orig = x + delsi_polovina_strany_rel, y + delsi_polovina_strany_rel
 
+    if pocet_zpracovanych_kloubu < 4:
+        barva_obdelniku = (0.0, 165.0, 255.0) # oranzova
+    elif pocet_zpracovanych_kloubu < 8:
+        barva_obdelniku = (0.0, 165.0, 70.0) # zelena
+    elif pocet_zpracovanych_kloubu < 12:
+        barva_obdelniku = (165.0, 70.0, 0.0) # modra
+    elif pocet_zpracovanych_kloubu == 12:
+        barva_obdelniku = (150.0, 0.0, 150.0) # fialova
+
     # barevne zvyrazneni vnitrku vyberu
     # cv2.rectangle(obrazek_ke_zobrazeni, (x_start, y_start), (x_end, y_end), (0.0, 165.0, 255.0), -1)    # absolutni rozmery
-    cv2.rectangle(obrazek_ke_zobrazeni, (x_start_rel, y_start_rel), (x_end_rel, y_end_rel), (0.0, 165.0, 255.0), -1)
+    cv2.rectangle(obrazek_ke_zobrazeni, (x_start_rel, y_start_rel), (x_end_rel, y_end_rel), barva_obdelniku, -1)
     # pridani polopruhledneho vyberu k puvodnimu obrazku
     mira_pruhlednosti = 0.75
     obrazek_ke_zobrazeni = cv2.addWeighted(obrazek_ke_zobrazeni, 1 - mira_pruhlednosti, snimek_puvodni, mira_pruhlednosti, 0)
     # ohraniceni vyberu s absolutnim rozmerem
     cv2.rectangle(obrazek_ke_zobrazeni, (x_start, y_start), (x_end, y_end), (150.0, 150.0, 150.0), 2)
     # ohraniceni vyberu s relativnim rozmerem
-    cv2.rectangle(obrazek_ke_zobrazeni, (x_start_rel, y_start_rel), (x_end_rel, y_end_rel), (0.0, 165.0, 255.0), 2)
+    cv2.rectangle(obrazek_ke_zobrazeni, (x_start_rel, y_start_rel), (x_end_rel, y_end_rel), barva_obdelniku, 2)
     cv2.rectangle(obrazek_ke_zobrazeni, (x_start_rel_orig, y_start_rel_orig), (x_end_rel_orig, y_end_rel_orig), (150.0, 150.0, 150.0), 2)
     # zobrazeni obrazku se zvyraznenym vyberem
     cv2.imshow("Tvorba vyrezu kloubu", obrazek_ke_zobrazeni)
