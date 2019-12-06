@@ -9,7 +9,7 @@ import pickle
 INPUT_IMAGES_DIR = "H:\MachineLearning\OZ_nove datasety_leto2019\_roztridene ruce\_NEART\_1-12-2017_28-2-2018"
 # OUTPUT_DIR = os.getcwd() + "/vystupy/"
 
-output_dir_abs = "Rozrezane (ablsolutni rozmery)"
+output_dir_abs = "Rozrezane (absolutni rozmery)"
 output_dir_rel = "Rozrezane (relativni rozmery)"
 
 OUTPUT_DIR = os.path.join(INPUT_IMAGES_DIR, output_dir_abs)
@@ -324,7 +324,7 @@ def get_coordinates_and_refresh_screen(delsi_polovina_strany, delsi_polovina_str
     elif pocet_zpracovanych_kloubu < 8:
         barva_obdelniku = (0.0, 165.0, 70.0) # zelena
     elif pocet_zpracovanych_kloubu < 12:
-        barva_obdelniku = (165.0, 70.0, 0.0) # modra
+        barva_obdelniku = (230.0, 150.0, 0.0) # modra
     elif pocet_zpracovanych_kloubu == 12:
         barva_obdelniku = (150.0, 0.0, 150.0) # fialova
 
