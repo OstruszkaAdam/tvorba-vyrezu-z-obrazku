@@ -6,7 +6,7 @@ import pickle
 
 # module-level variables ##############################################################################################
 # INPUT_IMAGES_DIR = os.getcwd() + "/vstupy/"
-INPUT_IMAGES_DIR = "H:\MachineLearning\OZ_nove datasety_leto2019\_roztridene ruce\_NEART\_1-3-2018_31-3-2018\znova"
+INPUT_IMAGES_DIR = "H:\MachineLearning\OZ_nove datasety_leto2019\_roztridene ruce\_NEART\_1-7-2018_31-7-2018"
 # OUTPUT_DIR = os.getcwd() + "/vystupy/"
 
 output_dir_abs = "Rozrezane (ablsolutni rozmery)"
@@ -17,6 +17,7 @@ OUTPUT_DIR_REL = os.path.join(INPUT_IMAGES_DIR, output_dir_rel)
 
 kolik_oriznout_z_vyberu = 0
 
+pocet_zpracovanych_snimku = 0
 pocet_zpracovanych_kloubu = 0
 x_souradnice_kloubu, y_souradnice_kloubu = 0, 0
 cropping = False
@@ -69,7 +70,7 @@ def main():
             global x_start, y_start, x_end, y_end, cropping
             x_start, y_start = 0, 0
             x_end, y_end = 10, 10
-            global pocet_zpracovanych_kloubu, cropping, souradnice_vsech_kloubu
+            global pocet_zpracovanych_snimku, pocet_zpracovanych_kloubu, cropping, souradnice_vsech_kloubu
             cropping = False
             pocet_zpracovanych_kloubu = 0
             souradnice_vsech_kloubu.clear()
@@ -86,7 +87,10 @@ def main():
 
             # otevrit a zpracovat snimek ##############################################################################
             nazev_puvodniho_snimku_vcetne_cesty_k_nemu = os.path.join(subdir, nazev_puvodniho_snimku)
-            print("zpracovava se soubor " + nazev_puvodniho_snimku_vcetne_cesty_k_nemu)
+
+            pocet_zpracovanych_snimku += 1
+
+            print("zpracovava se soubor " + str(pocet_zpracovanych_snimku) + ": " + nazev_puvodniho_snimku_vcetne_cesty_k_nemu)
 
             snimek_puvodni = cv2.imread(nazev_puvodniho_snimku_vcetne_cesty_k_nemu)
             # if we were not able to successfully open the image, continue with the next iteration of the for loop
@@ -198,7 +202,7 @@ def mouse_crop(event, x, y, flag=0, param=None):
         elif event == cv2.EVENT_LBUTTONDOWN:
             cropping = True
             x_souradnice_kloubu, y_souradnice_kloubu = x, y
-            print(str(pocet_zpracovanych_kloubu) + ". kloub v poradi je " + nazvy_vsech_kloubu[pocet_zpracovanych_kloubu]
+            print(str(pocet_zpracovanych_kloubu + 1) + ". kloub v poradi je " + nazvy_vsech_kloubu[pocet_zpracovanych_kloubu]
                   + ", jeho souradnice jsou: x = " + str(x_souradnice_kloubu) + " y = " + str(y_souradnice_kloubu))
 
         # if the left mouse button was released
