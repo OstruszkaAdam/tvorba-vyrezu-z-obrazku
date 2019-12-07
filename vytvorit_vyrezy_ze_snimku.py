@@ -6,7 +6,7 @@ import pickle
 
 # module-level variables ##############################################################################################
 # INPUT_IMAGES_DIR = os.getcwd() + "/vstupy/"
-INPUT_IMAGES_DIR = "H:\MachineLearning\OZ_nove datasety_leto2019\_roztridene ruce\_NEART\_1-12-2017_28-2-2018"
+INPUT_IMAGES_DIR = "H:\MachineLearning\OZ_nove datasety_leto2019\_roztridene ruce\_OA"
 # OUTPUT_DIR = os.getcwd() + "/vystupy/"
 
 output_dir_abs = "Rozrezane (absolutni rozmery)"

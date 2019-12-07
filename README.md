@@ -41,7 +41,9 @@ Pro každý jeden snímek:
    
    ![Zdroj: https://mywwwzone-heckyeahllc.netdna-ssl.com/wp-content/uploads/hand-x-ray-768x923.jpg](dokumentace/posloupnost-kliknuti.jpg)
 4. Na další snímek se přejde po stisknutí libovolné klávesy. 
-5. Pro projdutí všech snímků ve složce se program sám ukončí.
+5. Pro projdutí všech snímků ve složce se program sám ukončí. Při
+   předčasném ukončení se po opětovném spuštění program vrátí tam, kde
+   jste skončili. 
 
 # Podrobný popis funkčnosti
 -   V zadané složce i podložkách program hledá všechny soubory s
