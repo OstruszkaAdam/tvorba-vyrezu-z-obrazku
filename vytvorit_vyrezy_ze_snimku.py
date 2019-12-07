@@ -3,6 +3,7 @@ import numpy as np
 import cv2
 import os
 import pickle
+import fnmatch
 
 # module-level variables ##############################################################################################
 # INPUT_IMAGES_DIR = os.getcwd() + "/vstupy/"
@@ -63,9 +64,16 @@ def main():
     global x_souradnice_kloubu, y_souradnice_kloubu, snimek_puvodni, nazev_puvodniho_snimku, nazev_puvodniho_snimku_vcetne_cesty_k_nemu
     x_souradnice_kloubu, y_souradnice_kloubu = 0, 0
 
+    # pocet snimku ve slozce (bez vnorenych slozek)
+    image_count_jpg = len(fnmatch.filter(os.listdir(INPUT_IMAGES_DIR), '*.jpg'))
+    image_count_jpeg = len(fnmatch.filter(os.listdir(INPUT_IMAGES_DIR), '*.jpeg'))
+    image_count_png = len(fnmatch.filter(os.listdir(INPUT_IMAGES_DIR), '*.png'))
+    image_count_tif = len(fnmatch.filter(os.listdir(INPUT_IMAGES_DIR), '*.tif'))
+    image_count_tiff = len(fnmatch.filter(os.listdir(INPUT_IMAGES_DIR), '*.tiff'))
+    image_count_total = image_count_jpg + image_count_jpeg + image_count_png + image_count_tif + image_count_tiff
+
     for subdir, dirs, files in os.walk(INPUT_IMAGES_DIR):
         for nazev_puvodniho_snimku in files:
-
             # nasetovani a vynulovani promennych
             global x_start, y_start, x_end, y_end, cropping
             x_start, y_start = 0, 0
@@ -89,13 +97,14 @@ def main():
             nazev_puvodniho_snimku_vcetne_cesty_k_nemu = os.path.join(subdir, nazev_puvodniho_snimku)
 
             pocet_zpracovanych_snimku += 1
+            kolik_z_kolika_je_zpracovano = str(pocet_zpracovanych_snimku) + " z " + str(image_count_total) + " celkem"
 
-            print("zpracovava se soubor " + str(pocet_zpracovanych_snimku) + ": " + nazev_puvodniho_snimku_vcetne_cesty_k_nemu)
+            print("Zpracovava se soubor " + kolik_z_kolika_je_zpracovano + ": " + nazev_puvodniho_snimku_vcetne_cesty_k_nemu)
 
             snimek_puvodni = cv2.imread(nazev_puvodniho_snimku_vcetne_cesty_k_nemu)
             # if we were not able to successfully open the image, continue with the next iteration of the for loop
             if snimek_puvodni is None:
-                print("soubor s nazvem " + nazev_puvodniho_snimku + " se nepovedlo nacist do OpenCV")
+                print("Soubor s nazvem " + nazev_puvodniho_snimku + " se nepovedlo nacist do OpenCV")
                 continue
             # end if
 
