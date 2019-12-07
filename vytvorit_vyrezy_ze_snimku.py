@@ -99,6 +99,17 @@ def main():
                 continue
             # end if
 
+            # pokud uz byl vytvoren soubor se souradnicemu kloubu (tzn. pokud byl snimek uz zpracovat) preskocime dal
+            nazev_bez_pripony = os.path.splitext(nazev_puvodniho_snimku)[0]
+            nezev_souboru_se_souradnicemi = nazev_bez_pripony + ".p"
+            nezev_souboru_se_souradnicemi_vcetne_cesty_k_nemu = os.path.join(subdir, nezev_souboru_se_souradnicemi)
+
+            if os.path.isfile(nezev_souboru_se_souradnicemi_vcetne_cesty_k_nemu):
+                print("Soubor uz byl zpracovan drive (souradnice kloubu jiz jsou ulozeny)")
+                print("")
+                continue
+            # end if
+
             # zobrazit snimek (tak, aby se vesel na monitor) ##########################################################
             vyska_obrazku = np.size(snimek_puvodni, 0)
             sirka_obrazku = np.size(snimek_puvodni, 1)
