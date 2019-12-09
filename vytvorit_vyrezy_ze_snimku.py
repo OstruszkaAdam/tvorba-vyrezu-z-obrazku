@@ -7,7 +7,7 @@ import fnmatch
 
 # module-level variables ##############################################################################################
 # INPUT_IMAGES_DIR = os.getcwd() + "/vstupy/"
-INPUT_IMAGES_DIR = "H:\MachineLearning\OZ_nove datasety_leto2019\_roztridene ruce\_OA"
+INPUT_IMAGES_DIR = "H:\MachineLearning\OZ_nove datasety_leto2019\_roztridene ruce\_2_rozrezane_na_prave_a_leve_a_prevracene\_PA"
 # OUTPUT_DIR = os.getcwd() + "/vystupy/"
 
 output_dir_abs = "Rozrezane (absolutni rozmery)"
@@ -222,6 +222,12 @@ def mouse_crop(event, x, y, flag=0, param=None):
         elif event == cv2.EVENT_LBUTTONDOWN:
             cropping = True
             x_souradnice_kloubu, y_souradnice_kloubu = x, y
+
+            # pokud uzivatel klikne do roku, povazuje to program za neexistujici kloub, ktery reprezentuje nulovymi souradnicemi snimek nebude ukladat
+            if (x, y) < (30, 30):
+                x_souradnice_kloubu, y_souradnice_kloubu = 0,0
+            # end if
+
             print(str(pocet_zpracovanych_kloubu + 1) + ". kloub v poradi je " + nazvy_vsech_kloubu[pocet_zpracovanych_kloubu]
                   + ", jeho souradnice jsou: x = " + str(x_souradnice_kloubu) + " y = " + str(y_souradnice_kloubu))
 
@@ -285,10 +291,12 @@ def mouse_crop(event, x, y, flag=0, param=None):
             # cv2.imshow("Cropped image", roi)
             # cv2.imwrite(cropped_image_name, roi)
 
-            ulozitVystupniSnimky(nazev_puvodniho_snimku,
-                                 nazev_puvodniho_snimku_vcetne_cesty_k_nemu,
-                                 nazvy_vsech_kloubu[pocet_zpracovanych_kloubu],
-                                 roi, roi_rel)
+            if (x_souradnice_kloubu, y_souradnice_kloubu) > (0, 0): # ulozime vyrez, ale pouze pokud kloub existuje (tzn. pokud ma nenulove souradnice)
+                ulozitVystupniSnimky(nazev_puvodniho_snimku,
+                                     nazev_puvodniho_snimku_vcetne_cesty_k_nemu,
+                                     nazvy_vsech_kloubu[pocet_zpracovanych_kloubu],
+                                     roi, roi_rel)
+            # end if
 
 
             x_souradnice_kloubu, y_souradnice_kloubu = 0, 0
