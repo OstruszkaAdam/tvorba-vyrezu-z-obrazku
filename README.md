@@ -4,7 +4,7 @@ Program pro snadnou tvorbu výřezů kloubů z RTG snímků
 vytváří ze snímku čtvercové výřezy (v předem daném pořadí). Je to
 nejrychlejší možný způsob vytváření výřezů. Program je plně podřízen
 jedinému účelu – vytvořit z RTG snímků celých rukou nový dataset snímků
-jednotlivých kloubů.**
+jednotlivých kloubů. Funguje pouze na Windows**
 
 # Vstupy a výstupy
 ## Vstupy
