@@ -40,7 +40,7 @@ Pro každý jeden snímek:
    
    
    ![Zdroj: https://mywwwzone-heckyeahllc.netdna-ssl.com/wp-content/uploads/hand-x-ray-768x923.jpg](dokumentace/posloupnost-kliknuti.jpg)
-4. Na další snímek se přejde po stisknutí libovolné klávesy. 
+4. Na další snímek se přejde po stisknutí libovolné klávesy. Pokud jste při při zaklikávání kloubů udělali chybu, neklikejte už na další klouby a přejděte na další snímek – při příštím spuštění programu budete mít možnost snímek znovu zpracovat.
 5. Pro projdutí všech snímků ve složce se program sám ukončí. Při
    předčasném ukončení se po opětovném spuštění program vrátí tam, kde
    jste skončili. 
