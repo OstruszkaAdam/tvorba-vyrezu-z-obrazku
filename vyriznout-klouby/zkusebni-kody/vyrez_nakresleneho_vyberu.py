@@ -35,16 +35,16 @@ def shape_selection(event, x, y, flags, param):
 
 
 for subdir, dirs, files in os.walk(INPUT_IMAGES_DIR):
-    for nazev_puvodniho_snimku in files:
+    for filename in files:
 
         # preskoceni souboru, ktery neni snimek ###################################################################
         # if the file does not end in .jpg or .jpeg (case-insensitive), continue with the next iteration of the for loop
-        if not (nazev_puvodniho_snimku.lower().endswith(".jpg")):
+        if not (filename.lower().endswith(".jpg")):
             continue
         # end if
 
         # otevrit a zpracovat snimek ##############################################################################
-        nazev_puvodniho_snimku_vcetne_cesty_k_nemu = os.path.join(subdir, nazev_puvodniho_snimku)
+        nazev_puvodniho_snimku_vcetne_cesty_k_nemu = os.path.join(subdir, filename)
         print("zpracovava se soubor " + nazev_puvodniho_snimku_vcetne_cesty_k_nemu)
 
         image = cv2.imread(nazev_puvodniho_snimku_vcetne_cesty_k_nemu)

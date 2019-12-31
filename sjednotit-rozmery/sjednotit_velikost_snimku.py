@@ -27,11 +27,11 @@ def main():
                 continue
             # end if
 
-            old_name = os.path.join(os.path.abspath(root), filename)
-            print(old_name)
+            old_name_and_path = os.path.join(os.path.abspath(root), filename)
+            print(old_name_and_path)
 
-            # snimek_puvodni = cv2.imread(old_name)
-            snimek_puvodni = Image.open(old_name)
+            # snimek_puvodni = cv2.imread(old_name_and_path)
+            snimek_puvodni = Image.open(old_name_and_path)
             sirka_obrazku, vyska_obrazku = snimek_puvodni.size
             print("rozmery jsou " + str(sirka_obrazku) + " x " + str(vyska_obrazku))
 
@@ -39,6 +39,7 @@ def main():
             base, extension = os.path.splitext(filename)  # Separate base from extension
 
             newsize = (TARGET_SIZE, TARGET_SIZE)
+
 
             # TODO predeleat pouze na jeden rozmer (je to prece ctverec)
             if sirka_obrazku < TARGET_SIZE:
@@ -78,7 +79,7 @@ def main():
                 new_name = os.path.join(OUTPUT_DIR, new_name)
                 print(new_name)
 
-                shutil.copyfile(old_name, new_name)
+                shutil.copyfile(old_name_and_path, new_name)
             # end if
 
             # print(action_name)

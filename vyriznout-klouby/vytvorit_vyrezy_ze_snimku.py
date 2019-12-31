@@ -27,7 +27,7 @@ relativni_velikost_vyrezu = False
 dorovnavat_rozmery_na_ctverec = True
 
 snimek_puvodni = None
-nazev_puvodniho_snimku = None
+filename = None
 nazev_puvodniho_snimku_vcetne_cesty_k_nemu = None
 
 souradnice_vsech_kloubu = OrderedDict()
@@ -61,7 +61,7 @@ nazvy_vsech_kloubu = {
 
 #######################################################################################################################
 def main():
-    global x_souradnice_kloubu, y_souradnice_kloubu, snimek_puvodni, nazev_puvodniho_snimku, nazev_puvodniho_snimku_vcetne_cesty_k_nemu
+    global x_souradnice_kloubu, y_souradnice_kloubu, snimek_puvodni, filename, nazev_puvodniho_snimku_vcetne_cesty_k_nemu
     x_souradnice_kloubu, y_souradnice_kloubu = 0, 0
 
     # pocet snimku ve slozce (bez vnorenych slozek)
@@ -73,7 +73,7 @@ def main():
     image_count_total = image_count_jpg + image_count_jpeg + image_count_png + image_count_tif + image_count_tiff
 
     for subdir, dirs, files in os.walk(INPUT_IMAGES_DIR):
-        for nazev_puvodniho_snimku in files:
+        for filename in files:
             # nasetovani a vynulovani promennych
             global x_start, y_start, x_end, y_end, cropping
             x_start, y_start = 0, 0
@@ -85,16 +85,16 @@ def main():
 
             # preskoceni souboru, ktery neni snimek ###################################################################
             # if the file does not end in .jpg or .jpeg (case-insensitive), continue with the next iteration of the for loop
-            if not (nazev_puvodniho_snimku.lower().endswith(".jpg") or
-                    nazev_puvodniho_snimku.lower().endswith(".jpeg") or
-                    nazev_puvodniho_snimku.lower().endswith(".png") or
-                    nazev_puvodniho_snimku.lower().endswith(".tif") or
-                    nazev_puvodniho_snimku.lower().endswith(".tiff")):
+            if not (filename.lower().endswith(".jpg") or
+                    filename.lower().endswith(".jpeg") or
+                    filename.lower().endswith(".png") or
+                    filename.lower().endswith(".tif") or
+                    filename.lower().endswith(".tiff")):
                 continue
             # end if
 
             # otevrit a zpracovat snimek ##############################################################################
-            nazev_puvodniho_snimku_vcetne_cesty_k_nemu = os.path.join(subdir, nazev_puvodniho_snimku)
+            nazev_puvodniho_snimku_vcetne_cesty_k_nemu = os.path.join(subdir, filename)
 
             pocet_zpracovanych_snimku += 1
             kolik_z_kolika_je_zpracovano = str(pocet_zpracovanych_snimku) + " z " + str(image_count_total) + " celkem"
@@ -104,12 +104,12 @@ def main():
             snimek_puvodni = cv2.imread(nazev_puvodniho_snimku_vcetne_cesty_k_nemu)
             # if we were not able to successfully open the image, continue with the next iteration of the for loop
             if snimek_puvodni is None:
-                print("Soubor s nazvem " + nazev_puvodniho_snimku + " se nepovedlo nacist do OpenCV")
+                print("Soubor s nazvem " + filename + " se nepovedlo nacist do OpenCV")
                 continue
             # end if
 
             # pokud uz byl vytvoren soubor se souradnicemu kloubu (tzn. pokud byl snimek uz zpracovat) preskocime dal
-            nazev_bez_pripony = os.path.splitext(nazev_puvodniho_snimku)[0]
+            nazev_bez_pripony = os.path.splitext(filename)[0]
             nezev_souboru_se_souradnicemi = nazev_bez_pripony + ".p"
             nezev_souboru_se_souradnicemi_vcetne_cesty_k_nemu = os.path.join(subdir, nezev_souboru_se_souradnicemi)
 
@@ -161,7 +161,7 @@ def mouse_crop(event, x, y, flag=0, param=None):
     # grab references to the global variables
     global pocet_zpracovanych_kloubu
     global x_start, y_start, x_end, y_end, cropping
-    global snimek_puvodni, nazev_puvodniho_snimku, nazev_puvodniho_snimku_vcetne_cesty_k_nemu
+    global snimek_puvodni, filename, nazev_puvodniho_snimku_vcetne_cesty_k_nemu
     global nazvy_vsech_kloubu
     global x_souradnice_kloubu, y_souradnice_kloubu
     global souradnice_vsech_kloubu
@@ -292,7 +292,7 @@ def mouse_crop(event, x, y, flag=0, param=None):
             # cv2.imwrite(cropped_image_name, roi)
 
             if (x_souradnice_kloubu, y_souradnice_kloubu) > (0, 0): # ulozime vyrez, ale pouze pokud kloub existuje (tzn. pokud ma nenulove souradnice)
-                ulozitVystupniSnimky(nazev_puvodniho_snimku,
+                ulozitVystupniSnimky(filename,
                                      nazev_puvodniho_snimku_vcetne_cesty_k_nemu,
                                      nazvy_vsech_kloubu[pocet_zpracovanych_kloubu],
                                      roi, roi_rel)
