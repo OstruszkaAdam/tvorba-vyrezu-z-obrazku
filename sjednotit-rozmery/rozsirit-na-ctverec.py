@@ -68,26 +68,12 @@ def main():
                 nova_vyska = vyska_obrazku + kolik_pridat_na_strane_A + kolik_pridat_na_strane_B
                 print("nove rozmery jsou " + str(sirka_obrazku) + " x " + str(nova_vyska))
 
-                if (nova_vyska != sirka_obrazku):
-                    print()
-                    print("!!!!!!!!!!!!!!!!!")
-                    print("CHYBAAAAAAAAAAAAA")
-                    print("!!!!!!!!!!!!!!!!!")
-                    print()
-
             elif rozdil_rozmeru < 0: # vyska je vetsi, budeme rozsirovat vlevo a vpravo
                 snimek_upraveny = cv2.copyMakeBorder(snimek_puvodni, 0, 0, kolik_pridat_na_strane_A, kolik_pridat_na_strane_B, cv2.BORDER_CONSTANT, value=[0, 0, 0])
                 print("rozsiruje se vlevo o " + str(kolik_pridat_na_strane_A) + " a vpravo o " + str(kolik_pridat_na_strane_B))
                 nova_sirka = sirka_obrazku + kolik_pridat_na_strane_A + kolik_pridat_na_strane_B
                 print("nove rozmery jsou " + str(nova_sirka) + " x " + str(vyska_obrazku))
 
-
-                if (nova_sirka != vyska_obrazku):
-                    print()
-                    print("!!!!!!!!!!!!!!!!!")
-                    print("CHYBAAAAAAAAAAAAA")
-                    print("!!!!!!!!!!!!!!!!!")
-                    print()
             # end if
 
 
@@ -103,43 +89,6 @@ def main():
 
 
 # end main
-
-
-#######################################################################################################################
-def ulozitVystupniSnimek(nazev_snimku, nazev_snimku_vcetne_cesty_k_nemu, oznaceni_kloubu, snimek_k_ulozeni):
-    # oriznuti pripony z nazvu souboru
-    nazevSnimkuBezPripony = os.path.splitext(nazev_snimku)[0]
-    # vyjmuti samotne pripony
-    PouzePripona = os.path.splitext(nazev_snimku)[1]
-
-    cestaDoSlozkySeSnimkem = os.path.dirname(nazev_snimku_vcetne_cesty_k_nemu) + "/"  # ziskani cesty do slozky se snimkem
-
-    # pokud se cesta ke snimku rovna ceste ke vstupni slozce (tzn. snimek uz neni dale zanoreny do podslozek)
-    if cestaDoSlozkySeSnimkem == INPUT_DIR:
-        # jenom zpracovat snimek BEZ zpracovani jmena podslozky
-
-        nazevVystupnihoSnimku = OUTPUT_DIR + nazevSnimkuBezPripony + "_" + oznaceni_kloubu + "_" + PouzePripona
-        zapsatVystupniSnimekNaDisk(nazevVystupnihoSnimku, snimek_k_ulozeni)
-
-    # pokud snimek je dale zanoreny do podslozek
-    else:
-        # zpracovat snimek a zpracovat i jmeno podslozky (tzn. vytvorit ji v cilovem umisteni)
-
-        # ziskani nazvu podslozky, ve ktere je snimek umisteny
-        cestaDoSlozkySeSnimkem = os.path.dirname(nazev_snimku_vcetne_cesty_k_nemu)  # ziskani cesty do slozky se snimkem
-        nazevPodslozkySeSnimky = os.path.split(cestaDoSlozkySeSnimkem)[1]  # ziskani nazvu pouze posledni slozky
-
-        # vytvoreni podlozky v cilove slozky (pokud jeste neexistuje)
-        cilovaSlozkaVcetnePodslozky = OUTPUT_DIR + "/" + nazevPodslozkySeSnimky + "/"
-        if not os.path.exists(cilovaSlozkaVcetnePodslozky):
-            os.makedirs(cilovaSlozkaVcetnePodslozky)
-
-        nazevVystupnihoSnimku = cilovaSlozkaVcetnePodslozky + nazevSnimkuBezPripony + "_" + oznaceni_kloubu + PouzePripona
-        zapsatVystupniSnimekNaDisk(nazevVystupnihoSnimku, snimek_k_ulozeni)
-    # end if
-
-
-# end function
 
 
 #######################################################################################################################
