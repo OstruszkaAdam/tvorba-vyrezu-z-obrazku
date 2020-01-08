@@ -3,8 +3,9 @@ import shutil
 import cv2
 from PIL import Image
 import numpy as np
+import uuid
 
-INPUT_DIR = r"H:\MachineLearning\SLOUCENY-DATSET\hands\both"
+INPUT_DIR = r"C:\Users\Adam\Desktop\zdroj"
 
 output_dir_name = "rozsirene na ctverec"
 OUTPUT_DIR = os.path.join(INPUT_DIR, output_dir_name)
@@ -34,6 +35,7 @@ def main():
             print(old_name_and_path)
             base, extension = os.path.splitext(filename)  # Separate base from extension
             new_filename = "ctverec_" + base + extension
+            # new_filename = "ctverec_" + base + str(uuid.uuid1()) + extension
 
             new_name_and_path = os.path.join(OUTPUT_DIR, new_filename)
             # print(new_name_and_path)

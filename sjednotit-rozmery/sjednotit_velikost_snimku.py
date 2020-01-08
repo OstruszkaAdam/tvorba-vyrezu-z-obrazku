@@ -4,8 +4,15 @@ import cv2
 from PIL import Image
 import numpy as np
 
-INPUT_DIR = r"C:\Users\Adam\Desktop\zdroj"
-OUTPUT_DIR = r"C:\Users\Adam\Desktop\cíl"
+INPUT_DIR = r"H:\MachineLearning\OZ_nove datasety_leto2019\_roztridene ruce\_2_rozrezane_na_prave_a_leve_a_prevracene\_NEART"
+# OUTPUT_DIR = r"C:\Users\Adam\Desktop\cil"
+
+output_dir_base = os.path.dirname(INPUT_DIR)
+output_dir_name = "zmensene"
+
+OUTPUT_DIR = os.path.join(output_dir_base, output_dir_name)
+if not os.path.exists(OUTPUT_DIR):
+    os.makedirs(OUTPUT_DIR)
 
 TARGET_SIZE = 299
 
