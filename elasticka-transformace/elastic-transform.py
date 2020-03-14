@@ -1,13 +1,16 @@
 import os
 import shutil
 import cv2
-from PIL import Image
 import numpy as np
 import uuid
+from scipy.ndimage.interpolation import map_coordinates
+from scipy.ndimage.filters import gaussian_filter
 
-INPUT_DIR = r"H:\MachineLearning\SLOUCENY-DATSET\trenovaniOAI\kolena"
+# https://gist.github.com/erniejunior/601cdf56d2b424757de5
 
-output_dir_name = "rozsirene na ctverec"
+INPUT_DIR = r"C:\Users\Adam\Desktop\smazat"
+
+output_dir_name = "elasticky_deformovane"
 OUTPUT_DIR = os.path.join(INPUT_DIR, output_dir_name)
 
 if not os.path.exists(OUTPUT_DIR):
@@ -45,38 +48,7 @@ def main():
             sirka_obrazku = np.size(snimek_puvodni, 1)
             print("rozmery jsou " + str(sirka_obrazku) + " x " + str(vyska_obrazku))
 
-            rozdil_rozmeru = sirka_obrazku - vyska_obrazku
-            print("rozdil rozmeru je " + str(abs(rozdil_rozmeru)))
-
-            kolik_pridat_na_kazde_strane = abs(rozdil_rozmeru) / 2
-
-            # kolik_pridat_na_strane_A = 0
-            # kolik_pridat_na_strane_B = 0
-
-            if rozdil_rozmeru % 2 == 1:
-                kolik_pridat_na_strane_A = int(kolik_pridat_na_kazde_strane + 0.5)
-                kolik_pridat_na_strane_B = int(kolik_pridat_na_kazde_strane - 0.5)
-            else:
-                kolik_pridat_na_strane_A = int(kolik_pridat_na_kazde_strane)
-                kolik_pridat_na_strane_B = int(kolik_pridat_na_kazde_strane)
-
-
-            if rozdil_rozmeru == 0: # rozmery stran jsou stejne, nedelame nic a jdeme na dalsi obrazek
-                continue
-            elif rozdil_rozmeru > 0: # sirka je vetsi, budeme rozsirovat nahore a dole
-                # cv2.copyMakeBorder(obrazek, horni, dolni, leva, prava ,typ_okraje, barva)
-                snimek_upraveny = cv2.copyMakeBorder(snimek_puvodni, kolik_pridat_na_strane_A, kolik_pridat_na_strane_B, 0, 0,cv2.BORDER_CONSTANT, value=[0, 0, 0])
-                print("rozsiruje se nahore o " + str(kolik_pridat_na_strane_A) + " a dole o " + str(kolik_pridat_na_strane_B))
-                nova_vyska = vyska_obrazku + kolik_pridat_na_strane_A + kolik_pridat_na_strane_B
-                print("nove rozmery jsou " + str(sirka_obrazku) + " x " + str(nova_vyska))
-
-            elif rozdil_rozmeru < 0: # vyska je vetsi, budeme rozsirovat vlevo a vpravo
-                snimek_upraveny = cv2.copyMakeBorder(snimek_puvodni, 0, 0, kolik_pridat_na_strane_A, kolik_pridat_na_strane_B, cv2.BORDER_CONSTANT, value=[0, 0, 0])
-                print("rozsiruje se vlevo o " + str(kolik_pridat_na_strane_A) + " a vpravo o " + str(kolik_pridat_na_strane_B))
-                nova_sirka = sirka_obrazku + kolik_pridat_na_strane_A + kolik_pridat_na_strane_B
-                print("nove rozmery jsou " + str(nova_sirka) + " x " + str(vyska_obrazku))
-
-            # end if
+            snimek_upraveny = elastic_transform(snimek_puvodni, 500, 8)
 
 
             zapsatVystupniSnimekNaDisk(new_name_and_path, snimek_upraveny)
@@ -99,6 +71,31 @@ def zapsatVystupniSnimekNaDisk(nazevVystupnihoSnimkuVcetneCestyKNemu, snimekKter
     print("uklada se soubor " + nazevVystupnihoSnimkuVcetneCestyKNemu)
     print("")  # odradkovani
 
+
+# end function
+
+
+#######################################################################################################################
+def elastic_transform(image, alpha, sigma):
+    """Elastic deformation of images as described in [Simard2003]_.
+    .. [Simard2003] Simard, Steinkraus and Platt, "Best Practices for
+       Convolutional Neural Networks applied to Visual Document Analysis", in
+       Proc. of the International Conference on Document Analysis and
+       Recognition, 2003.
+    """
+    random_state = np.random.RandomState(None)
+
+    shape = image.shape
+    dx = gaussian_filter((random_state.rand(*shape) * 2 - 1), sigma, mode="constant", cval=0) * alpha
+    dy = gaussian_filter((random_state.rand(*shape) * 2 - 1), sigma, mode="constant", cval=0) * alpha
+    dz = np.zeros_like(dx)
+
+    x, y, z = np.meshgrid(np.arange(shape[0]), np.arange(shape[1]), np.arange(shape[2]))
+    print(x.shape)
+    indices = np.reshape(y+dy, (-1, 1)), np.reshape(x+dx, (-1, 1)), np.reshape(z, (-1, 1))
+
+    distored_image = map_coordinates(image, indices, order=1, mode='reflect')
+    return distored_image.reshape(image.shape)
 
 # end function
 
