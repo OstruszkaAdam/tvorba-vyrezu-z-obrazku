@@ -7,7 +7,7 @@ import fnmatch
 
 # module-level variables ##############################################################################################
 # INPUT_IMAGES_DIR = os.getcwd() + "/vstupy/"
-INPUT_IMAGES_DIR = "H:\MachineLearning\OZ_nove datasety_leto2019\_roztridene ruce\_2_rozrezane_na_prave_a_leve_a_prevracene\_RA"
+INPUT_IMAGES_DIR = r"H:\MachineLearning\OZ_nove datasety_leto2019\_roztridene ruce\_2_rozrezane_na_prave_a_leve_a_prevracene\_RA\originaly_a_souradnice\3znaky"
 # OUTPUT_DIR = os.getcwd() + "/vystupy/"
 
 output_dir_abs = "Rozrezane (absolutni rozmery)"
@@ -324,7 +324,7 @@ def spocitat_rozmery_a_vytvorit_vyrez(delsi_polovina_strany, kratsi_polovina_str
     if vzdalenost_k_okraji_prava < delsi_polovina_strany:
         tloustka_praveho_ramecku = delsi_polovina_strany - vzdalenost_k_okraji_prava
     # end if
-    if vzdalenost_k_okraji_dolni < delsi_polovina_strany:
+    if vzdalenost_k_okraji_dolni < delsi_polovina_strany :
         tloustka_dolniho_ramecku = delsi_polovina_strany - vzdalenost_k_okraji_dolni
     # end if
     roi = cv2.copyMakeBorder(roi, tloustka_horniho_ramecku, tloustka_dolniho_ramecku, tloustka_leveho_ramecku,

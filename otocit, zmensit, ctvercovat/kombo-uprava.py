@@ -12,13 +12,13 @@ import shutil
 
 TARGET_SIZE = 299
 
-INPUT_DIR = r"H:\MachineLearning\OZ_nove datasety_leto2019\_roztridene ruce\_2_rozrezane_na_prave_a_leve_a_prevracene\_PA\originaly_a_souradnice"
+INPUT_DIR = r"H:\MachineLearning\SLOUCENY-DATSET\trenovaniOAI\ruka"
 # OUTPUT_DIR = r"C:\Users\Adam\Desktop\cil"
 
 input_dir_name = os.path.basename(INPUT_DIR)
 output_dir_base = os.path.dirname(INPUT_DIR)
-# output_dir_name = input_dir_name + " otocene_fake 299px"
-output_dir_name = "otocene_fake_" + str(TARGET_SIZE)
+output_dir_name = input_dir_name + " otocene_fake 299px"
+# output_dir_name = "otocene_fake_" + str(TARGET_SIZE)
 
 OUTPUT_DIR = os.path.join(output_dir_base, output_dir_name)
 if not os.path.exists(OUTPUT_DIR):
@@ -72,7 +72,8 @@ for subdir, dirs, files in os.walk(INPUT_DIR):
 
         uhel_O = 0
 
-        uhly = [uhel_O, uhel_A, uhel_B, uhel_C, uhel_D]
+        # uhly = [uhel_O, uhel_A, uhel_B, uhel_C, uhel_D]
+        uhly = [uhel_O]
 
         # loop over the rotation angles
         # for angle in np.arange(0, 360, 15):
@@ -95,7 +96,7 @@ for subdir, dirs, files in os.walk(INPUT_DIR):
             vyska_otoceneho_obrazku = np.size(obrazek_otoceny, 0)
             sirka_otoceneho_obrazku = np.size(obrazek_otoceny, 1)
 
-            nahodna_velikost_orezu = round(random() * 10)  # nahodny rozmer oriznuteho pruhu
+            nahodna_velikost_orezu = round(random() * 15)  # nahodny rozmer oriznuteho pruhu
             velikost_orezu_horni = uhel_absolutni_velikost * 6 + nahodna_velikost_orezu
             velikost_orezu_leva_prava = uhel_absolutni_velikost * 5
             velikost_orezu_dolni = velikost_orezu_horni + round(uhel_absolutni_velikost * 10)
