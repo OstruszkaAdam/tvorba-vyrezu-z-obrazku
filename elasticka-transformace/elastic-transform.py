@@ -9,13 +9,16 @@ from scipy.ndimage.filters import gaussian_filter
 # https://gist.github.com/erniejunior/601cdf56d2b424757de5
 
 INPUT_DIR = r"C:\Users\Adam\Desktop\smazat"
+# OUTPUT_DIR = r"C:\Users\Adam\Desktop\cil"
 
-output_dir_name = "elasticky_deformovane"
-OUTPUT_DIR = os.path.join(INPUT_DIR, output_dir_name)
+input_dir_name = os.path.basename(INPUT_DIR)
+output_dir_base = os.path.dirname(INPUT_DIR)
+output_dir_name = input_dir_name + " elastic"
+# output_dir_name = "elastic_" + str(TARGET_SIZE)
 
+OUTPUT_DIR = os.path.join(output_dir_base, output_dir_name)
 if not os.path.exists(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR)
-
 
 #######################################################################################################################
 def main():
@@ -37,8 +40,8 @@ def main():
             old_name_and_path = os.path.join(os.path.abspath(subdir), filename)
             print(old_name_and_path)
             base, extension = os.path.splitext(filename)  # Separate base from extension
-            new_filename = "ctverec_" + base + extension
-            # new_filename = "ctverec_" + base + str(uuid.uuid1()) + extension
+            # new_filename = "elastic_" + base + extension
+            new_filename = "elastic_" + base + str(uuid.uuid1()) + extension
 
             new_name_and_path = os.path.join(OUTPUT_DIR, new_filename)
             # print(new_name_and_path)
@@ -48,7 +51,7 @@ def main():
             sirka_obrazku = np.size(snimek_puvodni, 1)
             print("rozmery jsou " + str(sirka_obrazku) + " x " + str(vyska_obrazku))
 
-            snimek_upraveny = elastic_transform(snimek_puvodni, 500, 8)
+            snimek_upraveny = elastic_transform(snimek_puvodni, 300, 8)
 
 
             zapsatVystupniSnimekNaDisk(new_name_and_path, snimek_upraveny)
@@ -82,6 +85,8 @@ def elastic_transform(image, alpha, sigma):
        Convolutional Neural Networks applied to Visual Document Analysis", in
        Proc. of the International Conference on Document Analysis and
        Recognition, 2003.
+       SIGMA... cim nizsi cislo, tim vyraznejsi mira zkrouceni. Pouzitelne jsou hodnoty 8 a vyse. Nad 10 uz nedela temer nic.
+       ALPHA... stejne jak sigma, ale opacny ucinek. Tady urcuje miru zkrouceni, ale cim vyssi hodnota, tim vetsi ucinek. Hodnoty zhruba okolo 500
     """
     random_state = np.random.RandomState(None)
 
