@@ -7,7 +7,7 @@ import fnmatch
 
 # module-level variables ##############################################################################################
 # INPUT_IMAGES_DIR = os.getcwd() + "/vstupy/"
-INPUT_IMAGES_DIR = r"H:\MachineLearning\OZ_nove datasety_leto2019\_roztridene ruce\_2_rozrezane_na_prave_a_leve_a_prevracene\_RA\originaly_a_souradnice\3znaky"
+INPUT_IMAGES_DIR = r"H:\MachineLearning\OZ_nove datasety_leto2019\_roztridene ruce\_2_rozrezane_na_prave_a_leve_a_prevracene\_RA\originaly_a_souradnice\1-2znaky"
 # OUTPUT_DIR = os.getcwd() + "/vystupy/"
 
 output_dir_abs = "Rozrezane (absolutni rozmery)"

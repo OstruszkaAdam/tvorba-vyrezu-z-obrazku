@@ -8,7 +8,7 @@ from scipy.ndimage.filters import gaussian_filter
 
 # https://gist.github.com/erniejunior/601cdf56d2b424757de5
 
-INPUT_DIR = r"C:\Users\Adam\Desktop\smazat"
+INPUT_DIR = r"H:\MachineLearning\problematicke snimky\OA otocene_fake_299px_V2"
 # OUTPUT_DIR = r"C:\Users\Adam\Desktop\cil"
 
 input_dir_name = os.path.basename(INPUT_DIR)
@@ -88,6 +88,9 @@ def elastic_transform(image, alpha, sigma):
        SIGMA... cim nizsi cislo, tim vyraznejsi mira zkrouceni. Pouzitelne jsou hodnoty 8 a vyse. Nad 10 uz nedela temer nic.
        ALPHA... stejne jak sigma, ale opacny ucinek. Tady urcuje miru zkrouceni, ale cim vyssi hodnota, tim vetsi ucinek. Hodnoty zhruba okolo 500
     """
+
+    alpha = 300
+    sigma = 8
     random_state = np.random.RandomState(None)
 
     shape = image.shape

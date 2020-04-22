@@ -12,15 +12,15 @@ import shutil
 
 TARGET_SIZE = 299
 
-INPUT_DIR = r"H:\MachineLearning\OZ_nove datasety_leto2019\_roztridene ruce\_5_ruce_trenovaci_testovaci\01_Rotridene hi-res bez uprav\02_Test\RA"
-OUTPUT_DIR = r"H:\MachineLearning\OZ_nove datasety_leto2019\_roztridene ruce\_5_ruce_trenovaci_testovaci\02_low-res augmentovane\02_Test\RA"
+INPUT_DIR = r"H:\MachineLearning\OZ_nove datasety_leto2019\_roztridene ruce\_4_klouby_trenovaci_testovaci\1_Zakladni verze\01_Train\RA"
+# OUTPUT_DIR = r"C:\Users\Adam\Desktop\cil"
 
 input_dir_name = os.path.basename(INPUT_DIR)
 output_dir_base = os.path.dirname(INPUT_DIR)
-output_dir_name = input_dir_name + " otocene_fake 299px"
+output_dir_name = input_dir_name + " flipnute"
 # output_dir_name = "otocene_fake_" + str(TARGET_SIZE)
 
-# OUTPUT_DIR = os.path.join(output_dir_base, output_dir_name)
+OUTPUT_DIR = os.path.join(output_dir_base, output_dir_name)
 if not os.path.exists(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR)
 
@@ -116,63 +116,10 @@ for subdir, dirs, files in os.walk(INPUT_DIR):
 
             # KONEC OTACENI
 
-            # ZACATEK ROZSIROVANI NA CTVEREC
+            snimek_prevraceny = cv2.flip(obrazek_otoceny, 1)
 
-            rozdil_rozmeru = sirka_otoceneho_obrazku - vyska_otoceneho_obrazku
-            print("rozdil rozmeru je " + str(abs(rozdil_rozmeru)))
 
-            kolik_pridat_na_kazde_strane = abs(rozdil_rozmeru) / 2
 
-            # kolik_pridat_na_strane_A = 0
-            # kolik_pridat_na_strane_B = 0
-
-            if rozdil_rozmeru % 2 == 1:
-                kolik_pridat_na_strane_A = int(kolik_pridat_na_kazde_strane + 0.5)
-                kolik_pridat_na_strane_B = int(kolik_pridat_na_kazde_strane - 0.5)
-            else:
-                kolik_pridat_na_strane_A = int(kolik_pridat_na_kazde_strane)
-                kolik_pridat_na_strane_B = int(kolik_pridat_na_kazde_strane)
-
-            if rozdil_rozmeru == 0:  # rozmery stran jsou stejne, nedelame nic a jdeme na dalsi obrazek
-                continue
-            elif rozdil_rozmeru > 0:  # sirka je vetsi, budeme rozsirovat nahore a dole
-                # cv2.copyMakeBorder(obrazek, horni, dolni, leva, prava ,typ_okraje, barva)
-                obrazek_ctvercovy = cv2.copyMakeBorder(obrazek_otoceny, kolik_pridat_na_strane_A, kolik_pridat_na_strane_B, 0, 0,
-                                                       cv2.BORDER_CONSTANT, value=[0, 0, 0])
-                print("rozsiruje se nahore o " + str(kolik_pridat_na_strane_A) + " a dole o " + str(kolik_pridat_na_strane_B))
-                nova_vyska = vyska_otoceneho_obrazku + kolik_pridat_na_strane_A + kolik_pridat_na_strane_B
-                print("nove rozmery jsou " + str(sirka_otoceneho_obrazku) + " x " + str(nova_vyska))
-
-            elif rozdil_rozmeru < 0:  # vyska je vetsi, budeme rozsirovat vlevo a vpravo
-                obrazek_ctvercovy = cv2.copyMakeBorder(obrazek_otoceny, 0, 0, kolik_pridat_na_strane_A, kolik_pridat_na_strane_B,
-                                                       cv2.BORDER_CONSTANT, value=[0, 0, 0])
-                print("rozsiruje se vlevo o " + str(kolik_pridat_na_strane_A) + " a vpravo o " + str(kolik_pridat_na_strane_B))
-                nova_sirka = sirka_otoceneho_obrazku + kolik_pridat_na_strane_A + kolik_pridat_na_strane_B
-                print("nove rozmery jsou " + str(nova_sirka) + " x " + str(vyska_otoceneho_obrazku))
-
-            # end if
-
-            # KONEC ROZSIROVANI NA CTVEREC
-
-            # ZACATEK ZMENSOVANI
-
-            vstup_do_pillow = cv2.cvtColor(obrazek_ctvercovy, cv2.COLOR_BGR2RGB)
-            obazek_zmenseny = Image.fromarray(vstup_do_pillow)
-
-            sirka_obrazku, vyska_obrazku = obazek_zmenseny.size
-            print("rozmery jsou " + str(sirka_obrazku) + " x " + str(vyska_obrazku))
-
-            action_name = ""
-            base, extension = os.path.splitext(filename)  # Separate base from extension
-
-            newsize = (TARGET_SIZE, TARGET_SIZE)
-
-            snimek_prevzorkovany = obazek_zmenseny.resize(newsize, Image.ANTIALIAS)
-
-            snimek_prevzorkovany_opencv = np.array(snimek_prevzorkovany)  # Convert to OpenCV
-            snimek_prevzorkovany_opencv = snimek_prevzorkovany_opencv[:, :, ::-1].copy()  # Convert RGB to BGR
-
-            # KONEC ZMENSOVANI
 
             # oriznuti pripony z nazvu souboru
             nazevSnimkuBezPripony = os.path.splitext(filename)[0]
@@ -184,16 +131,14 @@ for subdir, dirs, files in os.walk(INPUT_DIR):
             rozhazene_poradi = rozhazene_poradi + round(random() * 100)
             rozhazene_poradi = str(rozhazene_poradi)
 
-            # new_name = rozhazene_poradi + "_" + str(uuid.uuid1()) + "_" + nazevSnimkuBezPripony + "_OTOCENY_" + str(uhel_otoceni) + "_STUPNU_" + pouze_pripona
-
-            new_name = rozhazene_poradi + "_" + nazevSnimkuBezPripony + "_OTOC_" + str(uhel_otoceni) + "_STUP" + pouze_pripona
+            new_name = rozhazene_poradi + "_" + nazevSnimkuBezPripony + "_flip" + pouze_pripona
 
             # new_name = "OTOCENY_" + str(uhel_otoceni) + "_STUPNU_" + nazevSnimkuBezPripony + PouzePripona
             # Save the file to the new path
             new_name = os.path.join(OUTPUT_DIR, new_name)
 
             # cv2.imwrite(new_name, snimek_prevzorkovany_opencv)
-            cv2.imwrite(new_name, snimek_prevzorkovany_opencv, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+            cv2.imwrite(new_name, snimek_prevraceny, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
 
             print("uklada se soubor " + str(new_name))
 
