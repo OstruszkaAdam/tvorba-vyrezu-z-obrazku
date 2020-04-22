@@ -52,7 +52,7 @@ Pro každý jeden snímek:
     program automaticky uloží výřez a pojmenuje ho složením původního
     názvu souboru a lékařského označení daného kloubu. Aktuální oblast k
     vyřezání program ve snímku zvýrazní barevným rámečkem.
--   Je ošetřeno, že nelze vyznačit více než 12 uvedených kloubů.
+-   Je ošetřeno, že nelze vyznačit více než 13 uvedených kloubů.
 -   Všechny výřezy kloubů prstů mají rozlišení (absolutní) 299 x 299
     pixelů, což je vstupní rozměr do neuronové sítě architektury
     Inception. Kloub zápěstní má větší (absolutní) rozměr 500 x 500 px.
